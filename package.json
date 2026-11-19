@@ -1,0 +1,28 @@
+{
+  "name": "fariifeet-store",
+  "private": true,
+  "version": "1.0.0",
+  "type": "module",
+  "description": "FariiFeet — modern, mobile-first shoe storefront for Dar es Salaam, Tanzania.",
+  "scripts": {
+    "dev": "vite --port 5173 --strictPort --host",
+    "build": "vite build",
+    "check:i18n": "node check-i18n.mjs",
+    "check:jsx": "node jsx-check.mjs",
+    "check:render": "node render-check.mjs",
+    "check:orders": "node orders-check.mjs",
+    "check": "npm run check:jsx && npm run check:i18n && npm run check:render && npm run check:orders",
+    "preview": "vite preview --port 4173 --strictPort"
+  },
+  "dependencies": {
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1"
+  },
+  "devDependencies": {
+    "@vitejs/plugin-react": "^4.3.4",
+    "autoprefixer": "^10.4.20",
+    "postcss": "^8.4.49",
+    "tailwindcss": "^3.4.17",
+    "vite": "^5.4.11"
+  }
+}

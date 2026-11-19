@@ -1,0 +1,274 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    color-scheme: light;
+    /* Updated by useHeroScroll while the page scrolls (0 → 1) */
+    --hero-scroll: 0;
+
+    /* ---------------------------------------------------------------- */
+    /* Theme-aware neutrals (consumed by tailwind.config.js)            */
+    /* ---------------------------------------------------------------- */
+    --c-page: 250 246 247; /* shell      — page background            */
+    --c-page-soft: 243 233 235; /* shell-soft — quiet panels / wells  */
+    --c-panel: 255 255 255; /* panel      — cards, inputs, chips       */
+    --c-line: 232 217 221; /* blushline  — hairlines & borders        */
+    --c-ink: 59 43 51; /* plum       — primary text                  */
+    --c-ink-soft: 107 90 98; /* plum-soft  — secondary text           */
+  }
+
+  html.dark {
+    color-scheme: dark;
+    --c-page: 20 16 20;
+    --c-page-soft: 30 24 30;
+    --c-panel: 26 21 27;
+    --c-line: 58 47 57;
+    --c-ink: 246 240 242;
+    --c-ink-soft: 186 170 177;
+  }
+
+  * {
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  html {
+    scroll-behavior: smooth;
+  }
+
+  body {
+    @apply bg-shell font-sans text-plum antialiased;
+    background-image:
+      radial-gradient(58rem 38rem at 92% -6%, rgba(226, 187, 199, 0.28), transparent 62%),
+      radial-gradient(46rem 34rem at -8% 22%, rgba(232, 217, 221, 0.55), transparent 68%);
+    background-attachment: fixed;
+    transition: background-color 0.35s ease, color 0.35s ease;
+  }
+
+  html.dark body {
+    background-image:
+      radial-gradient(58rem 38rem at 92% -6%, rgba(226, 187, 199, 0.12), transparent 62%),
+      radial-gradient(46rem 34rem at -8% 22%, rgba(120, 84, 96, 0.16), transparent 68%);
+  }
+
+  ::selection {
+    @apply bg-blush text-obsidian;
+  }
+
+  :focus-visible {
+    outline: 2px solid #a9707f;
+    outline-offset: 3px;
+  }
+
+  ::-webkit-scrollbar {
+    width: 10px;
+    height: 10px;
+  }
+
+  ::-webkit-scrollbar-track {
+    background: rgb(var(--c-page-soft));
+  }
+
+  ::-webkit-scrollbar-thumb {
+    background: rgb(var(--c-line));
+    border-radius: 999px;
+    border: 2px solid rgb(var(--c-page-soft));
+  }
+
+  ::-webkit-scrollbar-thumb:hover {
+    background: #b79ca3;
+  }
+}
+
+@layer components {
+  .container-page {
+    @apply mx-auto w-full max-w-7xl px-4 sm:px-6 lg:px-8;
+  }
+
+  .glass {
+    @apply border border-white/15 bg-white/[0.07] backdrop-blur-xl;
+  }
+
+  .glass-dark {
+    @apply border border-espresso/70 bg-charcoal/70 backdrop-blur-xl;
+  }
+
+  .btn {
+    @apply inline-flex items-center justify-center gap-2 rounded-full px-6 py-3.5 text-sm font-semibold tracking-wide transition-all duration-300 disabled:cursor-not-allowed disabled:opacity-40;
+  }
+
+  .btn-blush {
+    @apply btn bg-blush text-obsidian shadow-blush-btn hover:bg-rose hover:shadow-glow active:scale-[0.98];
+  }
+
+  .btn-outline {
+    @apply btn border border-espresso bg-transparent text-rose hover:border-blush/70 hover:text-blush active:scale-[0.98];
+  }
+
+  .btn-ghost {
+    @apply btn border border-espresso/60 bg-charcoal/60 text-rose hover:border-blush/40 hover:bg-charcoal active:scale-[0.98];
+  }
+
+  /* Light editorial surfaces (page below the hero) */
+  .surface {
+    @apply rounded-[26px] border border-blushline bg-panel;
+  }
+
+  .surface-soft {
+    @apply rounded-[26px] border border-blushline bg-shell-soft;
+  }
+
+  .btn-plum {
+    @apply btn bg-plum text-shell shadow-soft hover:bg-obsidian hover:text-rose active:scale-[0.98];
+  }
+
+  .btn-line {
+    @apply btn border border-blushline bg-panel text-plum hover:border-plum/40 hover:bg-shell-soft active:scale-[0.98];
+  }
+
+  .eyebrow-plum {
+    @apply text-[11px] font-semibold uppercase tracking-[0.3em] text-plum-soft;
+  }
+
+  .chip-light {
+    @apply inline-flex items-center gap-1.5 rounded-full border border-blushline bg-panel/80 px-3 py-1.5 text-[10px] font-semibold uppercase tracking-[0.18em] text-plum-soft;
+  }
+
+  .chip {
+    @apply inline-flex items-center gap-1.5 rounded-full border border-espresso/80 bg-charcoal/80 px-3 py-1.5 text-[10px] font-semibold uppercase tracking-[0.18em] text-mocha;
+  }
+
+  .eyebrow {
+    @apply text-[11px] font-semibold uppercase tracking-[0.3em] text-mocha;
+  }
+
+  .field {
+    @apply w-full rounded-full border border-white/15 bg-white/[0.07] py-2.5 pl-10 pr-4 text-sm text-white placeholder:text-white/40 transition focus:border-blush/60 focus:outline-none focus:ring-2 focus:ring-blush/20;
+  }
+
+  /* Theme-aware field: off-white in light mode, charcoal in dark mode */
+  .field-light {
+    @apply w-full rounded-xl border border-blushline bg-shell-soft px-3.5 py-2.5 text-sm text-plum placeholder:text-plum-soft/60 transition focus:border-plum/40 focus:outline-none focus:ring-2 focus:ring-blush/30;
+  }
+
+  .scrollbar-hide {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+
+  .scrollbar-hide::-webkit-scrollbar {
+    display: none;
+  }
+
+  .text-stroke {
+    -webkit-text-stroke: 1px rgba(226, 187, 199, 0.28);
+    color: transparent;
+  }
+
+  .text-stroke-soft {
+    -webkit-text-stroke: 1px rgba(246, 242, 243, 0.12);
+    color: transparent;
+  }
+
+  .noise::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    opacity: 0.35;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.22'/%3E%3C/svg%3E");
+  }
+
+  .arch {
+    border-radius: 14rem 14rem 1.75rem 1.75rem;
+  }
+
+  .arch-mobile {
+    border-radius: 9rem 9rem 1.5rem 1.5rem;
+  }
+
+  /* ------------------------------------------------------------------ */
+  /* Hero scroll-linked motion                                          */
+  /* Layers read --hero-scroll (0 → 1) and move with pure CSS transforms */
+  /* ------------------------------------------------------------------ */
+  .hero-parallax {
+    will-change: transform;
+  }
+
+  /*
+   * Parallax travel budget.
+   * Each layer's Y travel below is multiplied by --hero-parallax-scale, which is
+   * tuned per breakpoint to fit inside the hero's bottom padding (pb-16 → pb-24
+   * in Hero.jsx). Layer rotation grows a card's bounding box by ~18px, so the
+   * budget deliberately keeps headroom: the artwork always settles inside the
+   * navy slab and never gets sliced by the section's overflow clip at the
+   * hero → shop boundary.
+   */
+  .hero-section {
+    --hero-parallax-scale: 0.32; /* pb-16 (64px) */
+  }
+
+  @media (min-width: 640px) {
+    .hero-section {
+      --hero-parallax-scale: 0.45; /* sm:pb-20 (80px) */
+    }
+  }
+
+  @media (min-width: 1024px) {
+    .hero-section {
+      --hero-parallax-scale: 0.85; /* lg:pb-24 (96px) + the footer strip row */
+    }
+  }
+
+  .hero-layer-rise {
+    transform: translate3d(0, calc(var(--hero-scroll, 0) * var(--hero-parallax-scale, 1) * -58px), 0)
+      rotate(calc(2.2deg + var(--hero-scroll, 0) * 2.6deg));
+  }
+
+  .hero-layer-slow {
+    transform: translate3d(0, calc(var(--hero-scroll, 0) * var(--hero-parallax-scale, 1) * 40px), 0)
+      rotate(calc(-2deg + var(--hero-scroll, 0) * -2.2deg));
+  }
+
+  .hero-layer-mid {
+    transform: translate3d(0, calc(var(--hero-scroll, 0) * var(--hero-parallax-scale, 1) * 76px), 0)
+      rotate(calc(3deg + var(--hero-scroll, 0) * 3deg));
+  }
+
+  .hero-layer-fast {
+    transform: translate3d(0, calc(var(--hero-scroll, 0) * var(--hero-parallax-scale, 1) * 116px), 0)
+      rotate(calc(-4deg + var(--hero-scroll, 0) * -4deg));
+  }
+
+  .hero-copy-shift {
+    transform: translate3d(0, calc(var(--hero-scroll, 0) * -30px), 0);
+    opacity: calc(1 - var(--hero-scroll, 0) * 0.4);
+  }
+
+  .hero-glow-shift {
+    transform: translate3d(0, calc(var(--hero-scroll, 0) * 60px), 0)
+      scale(calc(1 + var(--hero-scroll, 0) * 0.06));
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+
+  .hero-layer-rise,
+  .hero-layer-slow,
+  .hero-layer-mid,
+  .hero-layer-fast,
+  .hero-copy-shift,
+  .hero-glow-shift {
+    transform: none;
+    opacity: 1;
+  }
+}

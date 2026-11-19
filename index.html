@@ -1,0 +1,48 @@
+<!doctype html>
+<html lang="en" class="scroll-smooth">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/jpeg" href="/brand-logo.jpeg" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="theme-color" content="#FAF6F7" />
+    <meta
+      name="description"
+      content="FariiFeet — curated ladies' shoes in Dar es Salaam. Sneakers, kitten heels, slides and new drops with same-day delivery in Dar and countrywide shipping across Tanzania."
+    />
+    <meta property="og:title" content="FariiFeet — Step into elegance" />
+    <meta
+      property="og:description"
+      content="Curated ladies' shoes in Dar es Salaam. Sneakers, heels and slides with same-day delivery and nationwide shipping across Tanzania."
+    />
+    <meta property="og:image" content="/brand-name.jpeg" />
+    <meta property="og:type" content="website" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800&display=swap"
+      rel="stylesheet"
+    />
+    <script>
+      // Apply the saved theme before first paint so there is no white/dark flash.
+      (function () {
+        try {
+          var stored = window.localStorage.getItem('fariifeet-theme')
+          var prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches
+          var dark = stored ? stored === 'dark' : prefersDark
+          var root = document.documentElement
+          root.classList.toggle('dark', dark)
+          root.style.colorScheme = dark ? 'dark' : 'light'
+          var meta = document.querySelector('meta[name="theme-color"]')
+          if (meta) meta.setAttribute('content', dark ? '#141014' : '#FAF6F7')
+        } catch (error) {
+          /* first paint still works without a stored theme */
+        }
+      })()
+    </script>
+    <title>FariiFeet — Step into elegance | Dar es Salaam</title>
+  </head>
+  <body class="bg-shell">
+    <div id="root"></div>
+    <script type="module" src="/src/main.jsx"></script>
+  </body>
+</html>

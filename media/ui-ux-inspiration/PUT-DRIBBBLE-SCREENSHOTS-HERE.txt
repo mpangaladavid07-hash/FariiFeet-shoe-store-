@@ -1,0 +1,3 @@
+Save screenshots of your Dribbble UI/UX references in this folder:
+1. hero-heepzy-reference.png (from https://dribbble.com/shots/27595026-Shoes-Website-Landing-Page-Design-Heepzy)
+2. layout-tubik-reference.png (from https://dribbble.com/shots/7801805-Zero-Waste-Website-Product-Page)

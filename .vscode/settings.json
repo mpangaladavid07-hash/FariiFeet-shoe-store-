@@ -1,0 +1,25 @@
+{
+  "terminal.integrated.defaultProfile.windows": "PowerShell",
+  "terminal.integrated.shellIntegration.enabled": true,
+  "terminal.integrated.cwd": "${workspaceFolder}",
+  "terminal.integrated.env.windows": {
+    "PYTHONUTF8": "1"
+  },
+  "files.encoding": "utf8",
+  "files.autoGuessEncoding": true,
+  "files.watcherExclude": {
+    "**/node_modules_old/**": true,
+    "**/node_modules/**": true,
+    "**/dist/**": true
+  },
+  // Tailwind directives (@tailwind, @apply, @layer) are PostCSS at-rules that
+  // VS Code's built-in CSS language service does not recognise. They are
+  // processed by tailwindcss in postcss.config.js, so silence the false positive.
+  "css.lint.unknownAtRules": "ignore",
+  "scss.lint.unknownAtRules": "ignore",
+  "less.lint.unknownAtRules": "ignore",
+  "search.exclude": {
+    "**/node_modules_old/**": true,
+    "**/dist/**": true
+  }
+}

@@ -1,0 +1,25 @@
+{
+  // Gives VS Code's built-in JS/TS language service an explicit project for the
+  // Vite + React sources. Without this it falls back to an "inferred project",
+  // which is what produces stale/phantom diagnostics such as
+  // "JSX element 'div' has no corresponding closing tag" for files that parse
+  // fine (see `npm run check:jsx`, which validates every file with esbuild and
+  // @babel/parser).
+  "compilerOptions": {
+    "target": "ES2022",
+    "lib": ["ES2022", "DOM", "DOM.Iterable"],
+    "module": "ESNext",
+    "moduleResolution": "Bundler",
+    "jsx": "react-jsx",
+    "allowJs": true,
+    "checkJs": false,
+    "noEmit": true,
+    "skipLibCheck": true,
+    "resolveJsonModule": true,
+    "isolatedModules": true,
+    "allowSyntheticDefaultImports": true,
+    "forceConsistentCasingInFileNames": true
+  },
+  "include": ["src", "lightbox-preview.jsx"],
+  "exclude": ["node_modules", "node_modules_old", "dist"]
+}
