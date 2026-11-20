@@ -1,9 +1,35 @@
 import { translate } from './i18n'
 
-export const WHATSAPP_NUMBER = '255754623904'
-export const WHATSAPP_DISPLAY = '+255 754 623 904'
+/**
+ * Shop WhatsApp line, international format with digits only.
+ *
+ * `VITE_WHATSAPP_NUMBER` overrides it at dev/build time, so orders can be
+ * pointed at another phone for a demo or a test without touching the code.
+ * The shop's real line stays the fallback.
+ */
+const WHATSAPP_FALLBACK = '255754623904'
+const configuredWhatsApp = String(import.meta.env.VITE_WHATSAPP_NUMBER || '').replace(/\D/g, '')
+
+export const WHATSAPP_NUMBER = configuredWhatsApp || WHATSAPP_FALLBACK
+
+/** `255754623904` → `+255 754 623 904`, the form shown on the site. */
+export const WHATSAPP_DISPLAY =
+  WHATSAPP_NUMBER.length === 12
+    ? `+${WHATSAPP_NUMBER.slice(0, 3)} ${WHATSAPP_NUMBER.slice(3, 6)} ${WHATSAPP_NUMBER.slice(6, 9)} ${WHATSAPP_NUMBER.slice(9)}`
+    : `+${WHATSAPP_NUMBER}`
 export const INSTAGRAM_URL = 'https://www.instagram.com/fariifeet'
 export const INSTAGRAM_HANDLE = '@fariifeet'
+
+/**
+ * Retail shop pickup point. One source of truth for the hero, footer, checkout
+ * and any order copy that tells a shopper where to collect a pair.
+ */
+export const STORE_ADDRESS =
+  'Kariakoo, Mtaa wa DDC (DDC Street), 1st Floor, Room No. 76, Dar es Salaam, Tanzania'
+export const STORE_ADDRESS_SHORT = 'Kariakoo · Mtaa wa DDC · 1st Floor, Room No. 76'
+export const STORE_MAP_URL = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(
+  'Kariakoo, Mtaa wa DDC, Dar es Salaam, Tanzania',
+)}`
 
 export const formatTZS = (value) =>
   `TZS ${new Intl.NumberFormat('en-US', { maximumFractionDigits: 0 }).format(value)}`

@@ -6,17 +6,14 @@ export default {
   theme: {
     extend: {
       colors: {
-        obsidian: '#0D0C0B',
-        charcoal: '#171514',
-        espresso: '#453A33',
-        mocha: '#888178',
-        blush: '#E2BBC7',
-        rose: '#F6F2F3',
+        // Warm, blue-free house palette.
+        obsidian: '#18110D', // near-black espresso (dark bars & sections)
+        charcoal: '#221914', // warm dark espresso (secondary dark surface)
+        espresso: '#3A2C24', // mid espresso for dark-mode hairlines
+        mocha: '#8C8177',
+        blush: '#C89F9C', // dusty blush accent
+        rose: '#D6B4B0', // soft rose highlight
         emerald: '#10B981',
-        // Stage-1 editorial palette (dark stage surfaces, never re-themed)
-        navy: '#1E293B',
-        'navy-deep': '#243040',
-        'navy-soft': '#2C3A4E',
         // Theme-aware neutrals. Light values live in :root, dark values under
         // `html.dark` (src/index.css), so every `bg-shell`, `text-plum`, … class
         // flips automatically when the theme changes.
@@ -57,11 +54,11 @@ export default {
         ],
       },
       boxShadow: {
-        glow: '0 0 80px -20px rgba(226, 187, 199, 0.45)',
-        'blush-btn': '0 18px 40px -18px rgba(226, 187, 199, 0.75)',
-        card: '0 30px 60px -30px rgba(0, 0, 0, 0.85)',
-        soft: '0 26px 60px -36px rgba(59, 43, 51, 0.38)',
-        'hero-card': '0 40px 80px -42px rgba(8, 15, 26, 0.9)',
+        glow: '0 0 80px -20px rgba(200, 159, 156, 0.45)',
+        'blush-btn': '0 18px 40px -18px rgba(200, 159, 156, 0.65)',
+        card: '0 30px 60px -30px rgba(24, 17, 13, 0.85)',
+        soft: '0 26px 60px -36px rgba(24, 17, 13, 0.28)',
+        'hero-card': '0 40px 80px -42px rgba(24, 17, 13, 0.9)',
       },
       keyframes: {
         marquee: {

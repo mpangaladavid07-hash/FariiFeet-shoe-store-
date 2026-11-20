@@ -6,7 +6,6 @@ import {
   InstagramIcon,
   MoonIcon,
   SearchIcon,
-  SlidersIcon,
   SunIcon,
 } from './Icons'
 import { INSTAGRAM_HANDLE } from '../lib/store'
@@ -20,7 +19,7 @@ export function SearchField({ value, onChange, className = '' }) {
 
   return (
     <div className={`relative ${className}`}>
-      <SearchIcon className="pointer-events-none absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-white/45" />
+      <SearchIcon className="pointer-events-none absolute left-3 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-white/45" />
       <input
         ref={inputRef}
         type="search"
@@ -28,7 +27,7 @@ export function SearchField({ value, onChange, className = '' }) {
         onChange={(event) => onChange(event.target.value)}
         placeholder={t('nav.searchPlaceholder')}
         aria-label={t('nav.searchLabel')}
-        className="field h-10 pr-9 [&::-webkit-search-cancel-button]:hidden"
+        className="field h-9 rounded-full pl-9 pr-8 text-[12px] [&::-webkit-search-cancel-button]:hidden"
       />
       {value ? (
         <button
@@ -38,15 +37,11 @@ export function SearchField({ value, onChange, className = '' }) {
             inputRef.current?.focus()
           }}
           aria-label={t('nav.clearSearch')}
-          className="absolute right-2.5 top-1/2 -translate-y-1/2 rounded-full p-1 text-white/45 transition hover:text-blush"
+          className="absolute right-1.5 top-1/2 -translate-y-1/2 rounded-full p-1 text-white/45 transition hover:text-blush"
         >
-          <CloseIcon className="h-4 w-4" />
+          <CloseIcon className="h-3.5 w-3.5" />
         </button>
-      ) : (
-        <span className="pointer-events-none absolute right-3 top-1/2 hidden -translate-y-1/2 items-center gap-1 rounded border border-white/15 px-1.5 py-0.5 text-[9px] uppercase tracking-widest text-white/40 sm:flex">
-          <SlidersIcon className="h-3 w-3" /> {t('common.live')}
-        </span>
-      )}
+      ) : null}
     </div>
   )
 }
@@ -80,13 +75,13 @@ export default function Navbar({
 
   return (
     <header className="sticky top-0 z-40">
-      <div className="border-b border-white/10 bg-navy/95 backdrop-blur-xl">
+      <div className="border-b border-white/10 bg-obsidian/95 backdrop-blur-xl">
         <div className="container-page">
-          <div className="flex h-[68px] items-center gap-2 sm:gap-3">
+          <div className="flex h-16 items-center gap-2 sm:gap-3">
             <a href="#top" className="group flex shrink-0 items-center gap-2.5" aria-label={t('brand.home')}>
               <span className="relative h-10 w-10 overflow-hidden rounded-full ring-1 ring-blush/40 transition group-hover:ring-blush">
                 <img
-                  src="/brand-logo.jpeg"
+                  src="/images/fariifeet-logo.png"
                   alt={t('brand.logoAlt')}
                   className="h-full w-full object-cover"
                 />
@@ -104,7 +99,7 @@ export default function Navbar({
             <SearchField
               value={query}
               onChange={onQueryChange}
-              className="ml-auto hidden max-w-sm flex-1 md:block lg:max-w-md"
+              className="ml-auto hidden w-full max-w-[210px] flex-1 md:block lg:max-w-[280px]"
             />
 
             <div className="ml-auto flex items-center gap-2 md:ml-0">
@@ -153,7 +148,7 @@ export default function Navbar({
             </div>
           </div>
 
-          <div className="pb-3 md:hidden">
+          <div className="pb-2.5 md:hidden">
             <SearchField value={query} onChange={onQueryChange} />
           </div>
 

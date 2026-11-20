@@ -14,6 +14,7 @@ import {
   paymentForDelivery,
   paymentMethodsFor,
   whatsappLink,
+  STORE_ADDRESS,
 } from '../lib/store'
 import { orderSummaryText, orderWhatsAppLink, placeOrder } from '../lib/orders'
 import { useI18n } from '../lib/i18n'
@@ -312,6 +313,15 @@ export function CheckoutForm({
             )
           })}
         </div>
+
+        <p className="mt-2 flex items-start gap-1.5 rounded-xl border border-blushline bg-shell-soft px-3 py-2 text-[10px] leading-relaxed text-plum-soft">
+          <PinIcon className="mt-0.5 h-3 w-3 shrink-0 text-blush" />
+          <span>
+            <span className="font-semibold text-plum">{t('checkout.pickupTitle')}:</span>{' '}
+            {STORE_ADDRESS}
+            <span className="mt-0.5 block">{t('checkout.pickupNote')}</span>
+          </span>
+        </p>
 
         <div className="mt-3 space-y-3">
           <label className="block">

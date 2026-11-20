@@ -2,7 +2,6 @@ import { useCallback, useEffect, useMemo, useState } from 'react'
 import AnnouncementBar from './components/AnnouncementBar'
 import Navbar from './components/Navbar'
 import Hero from './components/Hero'
-import FeaturesStrip from './components/FeaturesStrip'
 import ProductGrid from './components/ProductGrid'
 import InstagramGallery from './components/InstagramGallery'
 import EditorialStory from './components/EditorialStory'
@@ -55,24 +54,25 @@ export default function App() {
     const search = query.trim().toLowerCase()
 
     return products.filter((product) => {
-      const inCategory =
-        category === 'all' ||
-        (category === 'new' ? product.isNew : product.category === category)
-      if (!inCategory) return false
-      if (!search) return true
+      /* A search always sweeps the whole catalogue — even if a category tab was
+         active when the shopper started typing — so results never dead-end. */
+      if (search) {
+        const haystack = [
+          product.name,
+          product.colorway,
+          product.category,
+          product.badge,
+          product.blurb,
+          product.description,
+        ]
+          .join(' ')
+          .toLowerCase()
 
-      const haystack = [
-        product.name,
-        product.colorway,
-        product.category,
-        product.badge,
-        product.blurb,
-        product.description,
-      ]
-        .join(' ')
-        .toLowerCase()
+        return haystack.includes(search)
+      }
 
-      return haystack.includes(search)
+      if (category === 'all') return true
+      return category === 'new' ? product.isNew : product.category === category
     })
   }, [query, category])
 
@@ -113,10 +113,12 @@ export default function App() {
     [scrollToShop],
   )
 
-  const handleShopNewDrops = useCallback(() => {
-    setCategory('new')
-    scrollToShop()
-  }, [scrollToShop])
+  /* Typing in the search box clears the category tab so the grid can match
+     across every shoe instead of showing "0 pairs" inside one filter. */
+  const handleQueryChange = useCallback((nextQuery) => {
+    setQuery(nextQuery)
+    if (nextQuery.trim()) setCategory('all')
+  }, [])
 
   const handleShopAll = useCallback(() => {
     setCategory('all')
@@ -183,7 +185,7 @@ export default function App() {
       <AnnouncementBar />
       <Navbar
         query={query}
-        onQueryChange={setQuery}
+        onQueryChange={handleQueryChange}
         category={category}
         onCategoryChange={handleCategoryChange}
         cartCount={itemCount}
@@ -191,12 +193,7 @@ export default function App() {
       />
 
       <main>
-        <Hero
-          onShopNow={handleShopAll}
-          onShopNewDrops={handleShopNewDrops}
-          onViewProduct={setSelectedProduct}
-        />
-        <FeaturesStrip />
+        <Hero onShopNow={handleShopAll} />
         <ProductGrid
           products={filteredProducts}
           category={category}

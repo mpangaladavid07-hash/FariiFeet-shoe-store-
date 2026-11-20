@@ -12,6 +12,11 @@ browser's `localStorage` and the desk reads that same list.
 3. Copy **Project URL** and the **anon public** key from
    **Project Settings → API**.
 
+[`schema.proposed.sql`](./schema.proposed.sql) is a tightened v2 of the same
+table (updated_at trigger, total/items/id checks, anon insert limited to
+`pending`, indexes on phone/status). It is **not** applied automatically — read
+it, then either run it after `schema.sql` or promote it into `schema.sql`.
+
 ## 2. Point the site at it
 
 Copy `.env.example` to `.env.local` (git-ignored) and fill in:

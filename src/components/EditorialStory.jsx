@@ -12,7 +12,7 @@ export default function EditorialStory({ onShopAll }) {
   ]
 
   return (
-    <section className="relative overflow-hidden bg-navy text-white">
+    <section className="relative overflow-hidden bg-obsidian text-white">
       <p
         aria-hidden="true"
         className="pointer-events-none absolute -right-6 top-4 select-none font-display text-[24vw] font-extrabold leading-none tracking-[-0.08em]"
@@ -31,7 +31,7 @@ export default function EditorialStory({ onShopAll }) {
               className="aspect-[4/5] w-full object-cover"
             />
           </div>
-          <div className="absolute -bottom-8 -right-3 w-40 overflow-hidden rounded-2xl border-[5px] border-navy shadow-xl sm:-right-8 sm:w-52">
+          <div className="absolute -bottom-8 -right-3 w-40 overflow-hidden rounded-2xl border-[5px] border-obsidian shadow-xl sm:-right-8 sm:w-52">
             <img
               src="/shoes/simple-sandal-2.jpg"
               alt={t('story.altInset')}
@@ -42,7 +42,7 @@ export default function EditorialStory({ onShopAll }) {
           <span className="absolute -left-2 top-6 rounded-full bg-blush px-4 py-2 font-chat text-[9px] font-bold uppercase tracking-[0.2em] text-obsidian sm:-left-4">
             {t('story.badgeCity')}
           </span>
-          <span className="absolute -bottom-4 left-4 hidden rounded-full border border-white/20 bg-navy/85 px-4 py-2 font-chat text-[9px] font-bold uppercase tracking-[0.18em] text-white/70 backdrop-blur sm:block">
+          <span className="absolute -bottom-4 left-4 hidden rounded-full border border-white/20 bg-charcoal/85 px-4 py-2 font-chat text-[9px] font-bold uppercase tracking-[0.18em] text-white/70 backdrop-blur sm:block">
             {t('story.badgeNew')}
           </span>
         </div>
@@ -75,7 +75,7 @@ export default function EditorialStory({ onShopAll }) {
             <button
               type="button"
               onClick={onShopAll}
-              className="btn group bg-white text-navy hover:bg-blush hover:text-obsidian"
+              className="btn group bg-rose text-obsidian hover:bg-blush hover:text-obsidian"
             >
               {t('story.cta')}
               <ArrowRightIcon className="h-4 w-4 transition-transform group-hover:translate-x-1" />

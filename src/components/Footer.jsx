@@ -1,6 +1,12 @@
 import { CATEGORIES } from '../data/products'
 import { useI18n } from '../lib/i18n'
-import { INSTAGRAM_HANDLE, WHATSAPP_DISPLAY, whatsappLink } from '../lib/store'
+import {
+  INSTAGRAM_HANDLE,
+  STORE_ADDRESS,
+  STORE_MAP_URL,
+  WHATSAPP_DISPLAY,
+  whatsappLink,
+} from '../lib/store'
 import { ArrowUpRightIcon, InstagramIcon, PinIcon, WhatsAppIcon } from './Icons'
 
 export default function Footer({ onCategorySelect }) {
@@ -28,7 +34,7 @@ export default function Footer({ onCategorySelect }) {
             <a href="#top" className="flex items-center gap-3" aria-label={t('brand.home')}>
               <span className="h-12 w-12 overflow-hidden rounded-full ring-1 ring-blush/30">
                 <img
-                  src="/brand-logo.jpeg"
+                  src="/images/fariifeet-logo.png"
                   alt={t('brand.logoAlt')}
                   className="h-full w-full object-cover"
                 />
@@ -115,7 +121,18 @@ export default function Footer({ onCategorySelect }) {
             <ul className="mt-4 space-y-3 text-xs text-mocha">
               <li className="flex items-start gap-2">
                 <PinIcon className="mt-0.5 h-3.5 w-3.5 shrink-0 text-blush" />
-                {t('footer.address')}
+                <span>
+                  {STORE_ADDRESS}
+                  <a
+                    href={STORE_MAP_URL}
+                    target="_blank"
+                    rel="noreferrer"
+                    className="mt-1.5 flex items-center gap-1 font-chat text-[9px] font-bold uppercase tracking-[0.14em] text-blush transition hover:text-rose"
+                  >
+                    {t('footer.directions')}
+                    <ArrowUpRightIcon className="h-3 w-3" />
+                  </a>
+                </span>
               </li>
               <li>
                 <a

@@ -11,7 +11,7 @@ import { fallbackPosts, fetchInstagramFeed, isFeedConfigured } from './feedfusio
  *  - the manual "Refresh feed" button
  *
  * The last successful payload is cached in localStorage so repeat visits paint
- * instantly, and the boutique photography is used whenever the feed is not
+ * instantly, and the shop photography is used whenever the feed is not
  * configured or unreachable.
  */
 

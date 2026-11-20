@@ -65,7 +65,7 @@ export default function InstagramLightbox({ posts, index, onClose, onNavigate, o
         aria-label={`${t('lightbox.seenOn')} · ${INSTAGRAM_HANDLE}`}
         className="relative flex max-h-[94dvh] w-full max-w-5xl animate-scale-in flex-col overflow-hidden rounded-t-[28px] border border-white/15 bg-shell shadow-2xl sm:max-h-[88vh] sm:rounded-[28px] md:flex-row"
       >
-        <div className="relative shrink-0 bg-navy md:w-[56%]">
+        <div className="relative shrink-0 bg-obsidian md:w-[56%]">
           <img
             src={post.image}
             alt={post.alt}
@@ -78,7 +78,7 @@ export default function InstagramLightbox({ posts, index, onClose, onNavigate, o
                 type="button"
                 onClick={() => onNavigate(-1)}
                 aria-label={t('lightbox.prev')}
-                className="absolute left-2 top-1/2 flex h-9 w-9 -translate-y-1/2 items-center justify-center rounded-full border border-white/20 bg-navy/70 text-white backdrop-blur transition hover:bg-navy"
+                className="absolute left-2 top-1/2 flex h-9 w-9 -translate-y-1/2 items-center justify-center rounded-full border border-white/20 bg-obsidian/75 text-white backdrop-blur transition hover:bg-charcoal"
               >
                 <ArrowRightIcon className="h-4 w-4 rotate-180" />
               </button>
@@ -86,11 +86,11 @@ export default function InstagramLightbox({ posts, index, onClose, onNavigate, o
                 type="button"
                 onClick={() => onNavigate(1)}
                 aria-label={t('lightbox.next')}
-                className="absolute right-2 top-1/2 flex h-9 w-9 -translate-y-1/2 items-center justify-center rounded-full border border-white/20 bg-navy/70 text-white backdrop-blur transition hover:bg-navy"
+                className="absolute right-2 top-1/2 flex h-9 w-9 -translate-y-1/2 items-center justify-center rounded-full border border-white/20 bg-obsidian/75 text-white backdrop-blur transition hover:bg-charcoal"
               >
                 <ArrowRightIcon className="h-4 w-4" />
               </button>
-              <span className="absolute bottom-2.5 left-1/2 -translate-x-1/2 rounded-full bg-navy/70 px-2.5 py-1 text-[9px] font-semibold uppercase tracking-[0.16em] text-white/80 backdrop-blur">
+              <span className="absolute bottom-2.5 left-1/2 -translate-x-1/2 rounded-full bg-obsidian/75 px-2.5 py-1 text-[9px] font-semibold uppercase tracking-[0.16em] text-white/80 backdrop-blur">
                 {index + 1} / {posts.length}
               </span>
             </>

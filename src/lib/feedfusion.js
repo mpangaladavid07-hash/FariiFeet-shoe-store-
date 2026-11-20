@@ -16,7 +16,7 @@ import { getProductById } from '../data/products'
  * `{ media: [] }`, `{ entries: [] }` or `{ edges: [{ node }] }`.
  *
  * If the keys are missing, the request fails, times out or returns nothing,
- * the gallery silently falls back to the boutique's own real photography.
+ * the gallery silently falls back to the shop's own real photography.
  */
 
 const env = import.meta.env || {}
@@ -204,7 +204,7 @@ export async function fetchInstagramFeed({ signal, limit = 8 } = {}) {
     return normalizeFeedPayload(payload).slice(0, limit)
   } catch {
     // Missing keys, offline, CORS, timeout or an unexpected payload: stay quiet
-    // and keep the boutique photography on screen.
+    // and keep the shop photography on screen.
     return []
   } finally {
     clearTimeout(timeoutId)
@@ -213,14 +213,14 @@ export async function fetchInstagramFeed({ signal, limit = 8 } = {}) {
 }
 
 /* ------------------------------------------------------------------ */
-/* Boutique fallback — always uses the store's real product photography */
+/* Shop fallback — always uses the store's real product photography */
 /* ------------------------------------------------------------------ */
 
 const FALLBACK_SEEDS = [
   {
     productId: 'new-balance-530',
     caption:
-      'The New Balance 530 in Silver Storm — restocked at the boutique this week. Tap to shop the pair.',
+      'The New Balance 530 in Silver Storm — restocked at our Kariakoo shop this week. Tap to shop the pair.',
   },
   {
     productId: 'tory-burch-kitten',
@@ -240,7 +240,7 @@ const FALLBACK_SEEDS = [
   },
   {
     productId: 'cobalt-loafer',
-    caption: 'Cobalt loafers, straight off the boutique shelf.',
+    caption: 'Cobalt loafers, straight off our shop shelf.',
   },
 ]
 
