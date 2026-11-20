@@ -11,6 +11,7 @@
 import { readFileSync } from 'node:fs'
 
 const API = 'https://api.netlify.com/api/v1'
+// Vite inlines these into the browser bundle, so they must stay readable.
 const PUSHED_KEYS = [
   'VITE_WHATSAPP_NUMBER',
   'VITE_ADMIN_PIN',
@@ -18,6 +19,18 @@ const PUSHED_KEYS = [
   'VITE_SUPABASE_ANON_KEY',
   'VITE_FEEDFUSION_URL',
   'VITE_FEEDFUSION_KEY',
+]
+// Server-only values for the Instagram importer (netlify/functions/*). They are
+// pushed as secrets with the Functions scope, so they never reach the bundle.
+const PUSHED_SERVER_KEYS = [
+  'SUPABASE_URL',
+  'SUPABASE_SERVICE_ROLE_KEY',
+  'INSTAGRAM_ACCESS_TOKEN',
+  'INSTAGRAM_USER_ID',
+  'INSTAGRAM_GRAPH_BASE',
+  'INSTAGRAM_SYNC_SECRET',
+  'INSTAGRAM_SYNC_LIMIT',
+  'INSTAGRAM_AUTO_PUBLISH',
 ]
 
 const args = process.argv.slice(2)
@@ -81,17 +94,29 @@ const api = async (path, init = {}) => {
 }
 
 const env = readEnv()
-const wanted = PUSHED_KEYS.filter((key) => String(env[key] || '').length > 0).map((key) => ({
-  key,
-  value: env[key],
-}))
+const wanted = [
+  ...PUSHED_KEYS.map((key) => ({
+    key,
+    value: env[key],
+    secret: false,
+    scopes: ['builds'],
+  })),
+  ...PUSHED_SERVER_KEYS.map((key) => ({
+    key,
+    value: env[key],
+    secret: true,
+    scopes: ['builds', 'functions'],
+  })),
+].filter((entry) => String(entry.value || '').length > 0)
 
-if (!wanted.length) fail('No VITE_* values found in .env — nothing to push.')
+if (!wanted.length) fail('No VITE_* or SUPABASE_/INSTAGRAM_ values found in .env — nothing to push.')
 if (!env.VITE_ADMIN_PIN) fail('VITE_ADMIN_PIN is empty in .env — refusing to deploy a PIN-less build.')
 
 console.log('\nFrom .env (values masked):')
-for (const { key, value } of wanted) {
-  console.log(`  ${key.padEnd(26)} set (len ${value.length})`)
+for (const { key, value, secret, scopes } of wanted) {
+  console.log(
+    `  ${key.padEnd(26)} set (len ${value.length})  scope ${scopes.join('+')}${secret ? '  secret' : ''}`,
+  )
 }
 if (!/^\d{4,12}$/.test(env.VITE_ADMIN_PIN)) {
   console.log('  ! VITE_ADMIN_PIN is not 4-12 digits — it will work, but it is unusual.')
@@ -131,11 +156,11 @@ const current = new Map(
   (Array.isArray(existing.body) ? existing.body : []).map((entry) => [entry.key, entry]),
 )
 
-for (const { key, value } of wanted) {
+for (const { key, value, secret, scopes } of wanted) {
   const payload = {
     key,
-    is_secret: false, // must stay readable so Vite can inline it into the bundle
-    scopes: ['builds'],
+    is_secret: secret, // VITE_* must stay readable so Vite can inline them
+    scopes,
     values: [{ value, context: 'all' }],
   }
   const found = current.get(key)
@@ -157,10 +182,17 @@ const stored = new Map(
   (Array.isArray(after.body) ? after.body : []).map((entry) => [entry.key, entry]),
 )
 console.log('\nStored on Netlify (values masked):')
-for (const { key } of wanted) {
+for (const { key, secret } of wanted) {
   const entry = stored.get(key)
   const length = entry?.values?.find((item) => item.context === 'all')?.value?.length ?? 0
-  console.log(`  ${length ? 'OK  ' : 'MISS'} ${key.padEnd(26)} ${length ? `len ${length}` : 'not readable'}`)
+  const state = entry
+    ? length
+      ? `len ${length}`
+      : secret
+        ? 'set (secret, not readable)'
+        : 'set'
+    : 'not readable'
+  console.log(`  ${entry ? 'OK  ' : 'MISS'} ${key.padEnd(26)} ${state}`)
 }
 
 if (deploy) {

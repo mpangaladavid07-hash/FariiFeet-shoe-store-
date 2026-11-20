@@ -12,11 +12,15 @@
     "check:render": "node render-check.mjs",
     "check:orders": "node orders-check.mjs",
     "check:catalogue": "node catalogue-check.mjs",
-    "check": "npm run check:jsx && npm run check:i18n && npm run check:render && npm run check:orders && npm run check:catalogue",
+    "check:instagram": "node instagram-check.mjs",
+    "check": "npm run check:jsx && npm run check:i18n && npm run check:render && npm run check:orders && npm run check:catalogue && npm run check:instagram",
     "preview": "vite preview --port 4173 --strictPort",
+    "instagram:sync": "node run-instagram-sync.mjs",
+    "instagram:sync:dry": "node run-instagram-sync.mjs --dry-run",
     "deploy:env": "node netlify-env.mjs"
   },
   "dependencies": {
+    "jimp": "^1.6.1",
     "react": "^18.3.1",
     "react-dom": "^18.3.1"
   },

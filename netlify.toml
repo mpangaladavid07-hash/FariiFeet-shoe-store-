@@ -4,6 +4,11 @@
 # VITE_SUPABASE_ANON_KEY and the optional FeedFusion keys live in the Netlify
 # dashboard (Site configuration -> Environment variables) so nothing sensitive
 # ever reaches this repository. See README -> "Deploying to Netlify".
+#
+# The Instagram importer additionally needs server-only variables (see README ->
+# "Instagram -> catalogue"): SUPABASE_SERVICE_ROLE_KEY, INSTAGRAM_ACCESS_TOKEN,
+# INSTAGRAM_USER_ID and INSTAGRAM_SYNC_SECRET. They are scoped to Functions and
+# never reach the browser bundle.
 
 [build]
   command = "npm run build"
@@ -12,9 +17,25 @@
 [build.environment]
   NODE_VERSION = "20"
 
+# Serverless functions (Instagram -> catalogue importer). Shared code lives in
+# netlify/lib/, outside this directory, so only real endpoints get deployed.
+[functions]
+  directory = "netlify/functions"
+
+# 04:00 UTC = 07:00 in Dar es Salaam, before the shop opens.
+[functions."instagram-sync-scheduled"]
+  schedule = "0 4 * * *"
+
+# Pretty URL for the importer. Must come before the single-page-app catch-all.
+[[redirects]]
+  from = "/api/instagram-sync"
+  to = "/.netlify/functions/instagram-sync"
+  status = 200
+
 # Single-page app: unknown paths are served index.html (status 200) so the
 # client-side /admin order desk loads when opened or refreshed directly.
 [[redirects]]
   from = "/*"
   to = "/index.html"
   status = 200
+
