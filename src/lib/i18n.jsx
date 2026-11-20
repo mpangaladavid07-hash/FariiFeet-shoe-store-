@@ -446,7 +446,7 @@ const en = {
     updateError: 'Could not update the status. Try again.',
     noOrdersHere: 'No orders with this status.',
     placed: 'Placed {date}',
-    pinHint: 'Default PIN is 1234 until you set VITE_ADMIN_PIN.',
+    pinHint: 'The PIN is managed by the shop owner — ask for it if you need order-desk access.',
   },
   // __EN_MORE__
 }
@@ -883,7 +883,7 @@ const sw = {
     updateError: 'Hatukuweza kubadilisha hali. Jaribu tena.',
     noOrdersHere: 'Hakuna oda yenye hali hii.',
     placed: 'Iliwekwa {date}',
-    pinHint: 'PIN ya kawaida ni 1234 hadi uweke VITE_ADMIN_PIN.',
+    pinHint: 'PIN husimamiwa na mmiliki wa duka — muulize ikiwa unahitaji kuingia kwenye dawati la oda.',
   },
   // __SW_MORE__
 }

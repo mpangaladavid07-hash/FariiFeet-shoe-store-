@@ -96,7 +96,7 @@ npm run dev
 ```
 
 - Storefront: <http://localhost:5173>
-- Order desk: <http://localhost:5173/admin> (PIN from `VITE_ADMIN_PIN`, default `1234`)
+- Order desk: <http://localhost:5173/admin> (PIN from `VITE_ADMIN_PIN`; if the variable is missing the desk falls back to `1234`, so set it before going live)
 
 ### 5. Build for production
 
@@ -124,14 +124,38 @@ Open `/admin` (or `#/admin`) and enter the PIN from `VITE_ADMIN_PIN`. The unlock
 
 ## Deploying to Netlify
 
-1. Connect the GitHub repository to Netlify.
-2. Build command: `npm run build`, publish directory: `dist`.
-3. Add `VITE_WHATSAPP_NUMBER`, `VITE_ADMIN_PIN`, `VITE_SUPABASE_URL`, `VITE_SUPABASE_ANON_KEY` (and the optional FeedFusion keys) under **Site configuration → Environment variables**.
-4. Run `supabase/schema.sql` in the Supabase SQL editor before switching on the cloud order store.
-5. Deploy, then replace the placeholder in the **Live demo** section above with the Netlify URL.
+1. Connect the GitHub repository to Netlify. `netlify.toml` already sets the build command (`npm run build`), the publish directory (`dist`), Node 20 and the SPA rewrite that lets `/admin` load when opened or refreshed directly.
+2. Add these under **Site configuration → Environment variables** (scope *All* so both production and deploy previews get them):
+
+   | Variable | Value |
+   | --- | --- |
+   | `VITE_WHATSAPP_NUMBER` | `255754623904` |
+   | `VITE_ADMIN_PIN` | the private order-desk PIN (never commit it; the repo only carries the `1234` dev fallback) |
+   | `VITE_SUPABASE_URL` | `https://<project-ref>.supabase.co` |
+   | `VITE_SUPABASE_ANON_KEY` | the project's **anon public** key (Supabase → Project settings → API) |
+   | `VITE_FEEDFUSION_URL`, `VITE_FEEDFUSION_KEY` | optional Instagram feed |
+
+3. Run `supabase/schema.sql` in the Supabase SQL editor before switching on the cloud order store.
+4. **Trigger a fresh deploy** — Vite inlines `VITE_*` values at build time, so existing builds keep the old settings until they are rebuilt.
+5. Open `/admin` and check the status banner: *Supabase connected — orders are stored in the cloud* means the keys reached the build; *Local test mode* means they did not.
+6. Replace the placeholder in the **Live demo** section above with the Netlify URL.
+
+### Setting the variables with the Netlify CLI
+
+```bash
+npm i -g netlify-cli
+netlify login
+netlify link                                     # pick the Fariifeet site
+netlify env:set VITE_WHATSAPP_NUMBER 255754623904
+netlify env:set VITE_ADMIN_PIN <your-order-desk-pin>
+netlify env:set VITE_SUPABASE_URL https://<project-ref>.supabase.co
+netlify env:set VITE_SUPABASE_ANON_KEY <anon-public-key>
+netlify env:list
+netlify deploy --prod                            # or "Trigger deploy" in the dashboard
+```
 
 ## Notes
 
 - Without Supabase keys, orders are saved in the browser's `localStorage`. The storefront and the `/admin` desk must then be opened in the same browser profile (for example, two tabs) to see the same orders.
-- Product photos in `public/shoes/` and `public/images/` are the boutique's own images — keep them when restyling.
+- Product photos in `public/shoes/` and `public/images/` are the shop's own images — keep them when restyling.
 - Prices are display-only Tanzania shillings (TZS); payment is confirmed with the shop on WhatsApp.

@@ -18,8 +18,18 @@ export const isSupabaseConfigured = Boolean(SUPABASE_URL && SUPABASE_ANON_KEY)
 /** Table that holds website orders (see supabase/schema.sql). */
 export const ORDERS_TABLE = 'orders'
 
-/** PIN for the hidden /admin order desk. Change it in `.env.local`. */
-export const ADMIN_PIN = String(import.meta.env.VITE_ADMIN_PIN || '1234').trim() || '1234'
+/**
+ * PIN for the hidden /admin order desk. Set `VITE_ADMIN_PIN` in `.env` locally
+ * and in the Netlify environment for the deployed site; the `1234` fallback
+ * below only exists so the desk still opens on a fresh clone with no `.env`.
+ */
+const configuredPin = String(import.meta.env.VITE_ADMIN_PIN || '').trim()
+
+if (!configuredPin && import.meta.env.DEV) {
+  console.warn('[fariifeet] VITE_ADMIN_PIN is not set — the order desk falls back to 1234.')
+}
+
+export const ADMIN_PIN = configuredPin || '1234'
 
 /** Storage keys shared by the bag, the order desk and the admin session. */
 export const ORDERS_STORAGE_KEY = 'fariifeet-orders-v1'

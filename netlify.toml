@@ -1,0 +1,20 @@
+# Netlify build settings for the Fariifeet Shoe Store storefront.
+#
+# Secrets are deliberately NOT stored here: VITE_ADMIN_PIN, VITE_SUPABASE_URL,
+# VITE_SUPABASE_ANON_KEY and the optional FeedFusion keys live in the Netlify
+# dashboard (Site configuration -> Environment variables) so nothing sensitive
+# ever reaches this repository. See README -> "Deploying to Netlify".
+
+[build]
+  command = "npm run build"
+  publish = "dist"
+
+[build.environment]
+  NODE_VERSION = "20"
+
+# Single-page app: unknown paths are served index.html (status 200) so the
+# client-side /admin order desk loads when opened or refreshed directly.
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200
