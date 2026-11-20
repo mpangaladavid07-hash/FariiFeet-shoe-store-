@@ -1,4 +1,4 @@
-import { getProductById } from '../data/products'
+import { getCatalogueProduct } from './catalogue'
 
 /**
  * FeedFusion → FariiFeet Instagram feed client.
@@ -121,7 +121,7 @@ function normalizePost(raw, index) {
     node.title,
   )
   const productId = firstString(node.productId, node.product_id, node.product)
-  const product = productId ? getProductById(productId) : null
+  const product = productId ? getCatalogueProduct(productId) : null
 
   const likes = Number(node.like_count ?? node.likes ?? node.likesCount ?? 0)
   const comments = Number(node.comments_count ?? node.comments ?? node.commentsCount ?? 0)
@@ -245,7 +245,7 @@ const FALLBACK_SEEDS = [
 ]
 
 export const fallbackPosts = FALLBACK_SEEDS.map((seed) => {
-  const product = getProductById(seed.productId)
+  const product = getCatalogueProduct(seed.productId)
   return {
     id: `farii-curated-${seed.productId}`,
     image: product?.image || '/shoes/new-balance.jpg',

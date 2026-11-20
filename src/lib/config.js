@@ -18,6 +18,9 @@ export const isSupabaseConfigured = Boolean(SUPABASE_URL && SUPABASE_ANON_KEY)
 /** Table that holds website orders (see supabase/schema.sql). */
 export const ORDERS_TABLE = 'orders'
 
+/** Table that holds the live catalogue (see supabase/products.sql). */
+export const PRODUCTS_TABLE = 'products'
+
 /**
  * PIN for the hidden /admin order desk. Set `VITE_ADMIN_PIN` in `.env` locally
  * and in the Netlify environment for the deployed site; the `1234` fallback

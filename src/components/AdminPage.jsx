@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useState } from 'react'
 import { ADMIN_PIN, ADMIN_SESSION_KEY, isSupabaseConfigured } from '../lib/config'
+import { useCatalogue } from '../lib/catalogue'
 import { ORDER_STATUSES, loadOrders, setOrderStatus, statusLabelKey } from '../lib/orders'
 import { CHECKOUT_PAYMENTS, DELIVERY_OPTIONS, formatPhone, formatTZS } from '../lib/store'
 import { useI18n } from '../lib/i18n'
@@ -143,6 +144,7 @@ function OrderCard({ order, t, lang, busy, onStatusChange }) {
 
 export default function AdminPage() {
   const { t, lang } = useI18n()
+  const catalogue = useCatalogue()
   const [unlocked, setUnlocked] = useState(readUnlocked)
   const [pin, setPin] = useState('')
   const [pinError, setPinError] = useState('')
@@ -318,6 +320,11 @@ export default function AdminPage() {
           </span>
           <span className="font-chat text-[10px] uppercase tracking-[0.12em] text-plum-soft">
             {t(orders.length === 1 ? 'admin.orderOne' : 'admin.orders', { count: orders.length })}
+          </span>
+          <span className="font-chat text-[10px] uppercase tracking-[0.12em] text-plum-soft">
+            {t(catalogue.isCloud ? 'admin.catalogueCloud' : 'admin.catalogueLocal', {
+              count: catalogue.products.length,
+            })}
           </span>
         </div>
 

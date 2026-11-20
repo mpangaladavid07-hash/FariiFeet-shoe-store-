@@ -11,7 +11,8 @@
     "check:jsx": "node jsx-check.mjs",
     "check:render": "node render-check.mjs",
     "check:orders": "node orders-check.mjs",
-    "check": "npm run check:jsx && npm run check:i18n && npm run check:render && npm run check:orders",
+    "check:catalogue": "node catalogue-check.mjs",
+    "check": "npm run check:jsx && npm run check:i18n && npm run check:render && npm run check:orders && npm run check:catalogue",
     "preview": "vite preview --port 4173 --strictPort",
     "deploy:env": "node netlify-env.mjs"
   },

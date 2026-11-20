@@ -1,5 +1,5 @@
 import { useEffect, useRef } from 'react'
-import { getProductById } from '../data/products'
+import { getCatalogueProduct } from '../lib/catalogue'
 import { useI18n } from '../lib/i18n'
 import { formatTZS, INSTAGRAM_HANDLE } from '../lib/store'
 import { ArrowRightIcon, CloseIcon, InstagramIcon } from './Icons'
@@ -47,7 +47,7 @@ export default function InstagramLightbox({ posts, index, onClose, onNavigate, o
 
   if (!post) return null
 
-  const product = post.productId ? getProductById(post.productId) : null
+  const product = post.productId ? getCatalogueProduct(post.productId) : null
   const hasMultiple = posts.length > 1
   const dateLabel = formatPostDate(post.date)
 

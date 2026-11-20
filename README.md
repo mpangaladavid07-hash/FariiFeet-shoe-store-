@@ -27,6 +27,7 @@ The shop address is shown in the hero, in the footer "Visit" block and in the ch
 - **Bilingual (EN / SW)** — every label, validation message and order message exists in English and Kiswahili; the choice is remembered in `localStorage`.
 - **Light & dark themes** — warm ivory/alabaster surfaces in light mode, espresso/near-black in dark mode, with the same dusty blush accents.
 - **Admin order desk** — a hidden route at `/admin`, unlocked with a PIN, to review orders and move them through *Pending → Out for Delivery → Delivered*.
+- **Catalogue you can edit yourself** — names, TZS prices, photos and categories live in the Supabase `products` table, so the shop owner changes a price in the Supabase dashboard and the storefront follows on the next page load. With no Supabase keys the built-in catalogue in `src/data/products.js` keeps the shop fully browsable.
 
 ## Tech stack
 
@@ -45,11 +46,14 @@ public/
 src/
   App.jsx                          storefront composition, global search & bag state
   components/                      Hero, Navbar, ProductGrid, CartDrawer, AdminPage, …
-  data/products.js                 catalogue: names, prices, sizes, categories
+  data/products.js                 built-in catalogue + offline fallback
   lib/store.js                     WhatsApp number, shop address, delivery & payment
+  lib/catalogue.js                 reads the live catalogue from Supabase
   lib/orders.js                    order records, totals, receipts, admin statuses
   lib/i18n.jsx                     English ⇄ Kiswahili dictionary + provider
 supabase/schema.sql                orders table + RLS, for cloud storage
+supabase/products.sql              products table + RLS, editable in the dashboard
+supabase/seed-products.sql         one-time copy of the current 21 shoes
 ```
 
 ## Local setup
@@ -116,11 +120,67 @@ npm run preview   # serves dist/ at http://localhost:4173
 | `npm run check:jsx` | Parses every JSX module for syntax errors |
 | `npm run check:render` | Renders the app and key components server-side |
 | `npm run check:orders` | Tests order IDs, totals, phones, statuses and WhatsApp links |
+| `npm run check:catalogue` | Tests the Supabase product mapping and the offline fallback |
 | `npm run check` | All of the checks above |
 
 ## Admin order desk
 
 Open `/admin` (or `#/admin`) and enter the PIN from `VITE_ADMIN_PIN`. The unlock is kept in `sessionStorage` for the tab, so it is asked again after the browser is closed. Orders arrive from the checkout as **Pending**; the desk can move them to **Out for Delivery** and **Delivered**.
+
+## Managing products in Supabase
+
+The storefront reads its shoes from the `products` table in Supabase, so pricing is a dashboard job — no code edits, no redeploy. The built-in list in `src/data/products.js` is only a fallback for an empty `.env` or an unreachable project.
+
+### One-time setup
+
+1. Create a project at <https://supabase.com> (any region close to Tanzania, e.g. *eu-central-1*).
+2. Open **SQL → New query**, paste all of `supabase/products.sql` and run it. That creates the table, its indexes and a read-only policy for the anon key.
+3. Paste and run `supabase/seed-products.sql` — a one-time copy of the 21 shoes currently in the shop, so the site looks identical on the first load. Re-running it is safe: rows that already exist are skipped, so prices you edited later are never overwritten.
+4. Copy the values from **Project settings → API** into `.env`:
+
+   ```env
+   VITE_SUPABASE_URL=https://<project-ref>.supabase.co
+   VITE_SUPABASE_ANON_KEY=<anon public key>
+   ```
+
+   Use the **anon public** key only. Never put the `service_role` key in a `VITE_` variable — Vite inlines it into the public bundle.
+5. Restart `npm run dev`. Open `/admin`: the badge should read *Shop catalogue: 21 shoes from Supabase*. If it says *built-in demo shoes*, the keys are missing or the SQL was not run.
+
+### Change a price (the everyday job)
+
+1. Supabase dashboard → **Table editor → products**.
+2. Click the `price` cell of a shoe, type the new amount in whole shillings (e.g. `145000`, no commas, no `TZS`) and press Enter.
+3. Refresh the storefront. The card, product page, bag and checkout all use the new price.
+
+Product edits do **not** need a Netlify redeploy — only changes to `VITE_*` environment variables do, because Vite bakes those into the build.
+
+### What each column does
+
+| Column | Type | Purpose |
+| --- | --- | --- |
+| `id` | text | URL-safe slug and primary key, e.g. `new-balance-530`. Keep it stable — saved bags and Instagram links point at it. |
+| `name` | text | Title on the card and product page. |
+| `price` | integer | Selling price in **TZS**, whole shillings. |
+| `image_url` | text | `/shoes/new-balance.jpg` (a file in `public/shoes/`) or a full `https://…` URL, e.g. a Supabase Storage public link. |
+| `category` | text | `sneakers`, `heels` or `slides` — drives the Shop tabs and the footer category links. |
+| `sizes` | integer[] | EU sizes stocked, e.g. `{36,37,38,39,40}`. |
+| `sold_out` | integer[] | Sizes that are temporarily unavailable (struck through in the size picker). |
+| `compare_at` | integer | Optional "was" price in TZS; fills the *Save TZS …* badge. Leave empty when there is no discount. |
+| `is_new` | boolean | Shows the shoe under **New Drops**. |
+| `is_active` | boolean | `false` hides the shoe from the shop without deleting the row. |
+| `colorway`, `badge`, `blurb`, `description`, `details` | text / text[] | Copy shown on the card and product page. `description` and `details` fall back to the original copy for seeded shoes. |
+| `rating` | numeric | Star rating shown on the card (4.6–4.9 looks natural). |
+| `sort_order` | integer | Grid order, lowest first; seeded shoes step by 10, so `15` slots a new pair between two others. |
+
+### Add a new shoe
+
+**Table editor → products → Insert row**: give it a new `id`, fill `name`, `price`, `image_url` and `category`, set `sizes` to something like `{37,38,39,40}`, then save. To use a photo that is not in the repo, upload it in **Storage**, make the bucket public and paste the public URL into `image_url`.
+
+### Safety notes
+
+- Shoppers can only **read** this table: the row-level-security policy grants `select` to the anon role and nothing else. Editing happens in the dashboard, which uses the service role.
+- An intentionally empty table shows an empty shop (that is how you would pause the catalogue); a failed request falls back to the built-in list and logs a warning in the browser console.
+- `VITE_SUPABASE_URL` and `VITE_SUPABASE_ANON_KEY` also switch the order desk from `localStorage` to the cloud — see `supabase/schema.sql`.
 
 ## Deploying to Netlify
 
@@ -135,7 +195,7 @@ Open `/admin` (or `#/admin`) and enter the PIN from `VITE_ADMIN_PIN`. The unlock
    | `VITE_SUPABASE_ANON_KEY` | the project's **anon public** key (Supabase → Project settings → API) |
    | `VITE_FEEDFUSION_URL`, `VITE_FEEDFUSION_KEY` | optional Instagram feed |
 
-3. Run `supabase/schema.sql` in the Supabase SQL editor before switching on the cloud order store.
+3. Run `supabase/schema.sql` (orders) and `supabase/products.sql` + `supabase/seed-products.sql` (catalogue) in the Supabase SQL editor before switching on the cloud store.
 4. **Trigger a fresh deploy** — Vite inlines `VITE_*` values at build time, so existing builds keep the old settings until they are rebuilt.
 5. Open `/admin` and check the status banner: *Supabase connected — orders are stored in the cloud* means the keys reached the build; *Local test mode* means they did not.
 6. Replace the placeholder in the **Live demo** section above with the Netlify URL.

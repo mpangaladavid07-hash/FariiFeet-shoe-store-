@@ -9,45 +9,64 @@ import ConciergeCTA from './components/ConciergeCTA'
 import Footer from './components/Footer'
 import ProductModal from './components/ProductModal'
 import CartDrawer from './components/CartDrawer'
-import { getProductById, products } from './data/products'
+import { getCatalogueProduct, useCatalogue } from './lib/catalogue'
 import { useI18n } from './lib/i18n'
 import { cartCount, whatsappLink } from './lib/store'
 import { WhatsAppIcon } from './components/Icons'
 
 const BAG_STORAGE_KEY = 'fariifeet-bag-v1'
 
-function loadBag() {
+/* The bag is persisted as id + size + qty, never as prices, so a price edit in
+   the Supabase dashboard is picked up the next time the bag is hydrated. */
+function readBagEntries() {
   try {
     const raw = window.localStorage.getItem(BAG_STORAGE_KEY)
     if (!raw) return []
     const saved = JSON.parse(raw)
     if (!Array.isArray(saved)) return []
-
-    return saved
-      .map((entry) => {
-        const product = getProductById(entry?.productId)
-        const qty = Number(entry?.qty)
-        const size = Number(entry?.size)
-        if (!product || !product.sizes.includes(size) || !qty) return null
-        return {
-          ...product,
-          size,
-          qty: Math.min(10, Math.max(1, qty)),
-          lineId: entry.lineId || `${product.id}-${size}`,
-        }
-      })
-      .filter(Boolean)
+    return saved.filter((entry) => entry && entry.productId)
   } catch {
     return []
   }
 }
 
+function resolveBagEntries(entries) {
+  return entries
+    .map((entry) => {
+      const product = getCatalogueProduct(entry.productId)
+      const qty = Number(entry.qty)
+      const size = Number(entry.size)
+      if (!product || !qty) return null
+      if (!(product.sizes || []).includes(size)) return null
+      return {
+        ...product,
+        size,
+        qty: Math.min(10, Math.max(1, qty)),
+        lineId: entry.lineId || `${product.id}-${size}`,
+      }
+    })
+    .filter(Boolean)
+}
+
+/** Keep quantities changed this session, but refresh the product snapshot. */
+function mergeBagLines(resolved, current) {
+  const lines = new Map(resolved.map((line) => [line.lineId, line]))
+  current.forEach((line) => {
+    const known = lines.get(line.lineId)
+    lines.set(line.lineId, known ? { ...known, qty: line.qty } : line)
+  })
+  return Array.from(lines.values())
+}
+
+
 export default function App() {
   const { t } = useI18n()
+  const { products, source: catalogueSource } = useCatalogue()
+  const [bagEntries] = useState(readBagEntries)
   const [query, setQuery] = useState('')
   const [category, setCategory] = useState('all')
   const [selectedProduct, setSelectedProduct] = useState(null)
-  const [cartItems, setCartItems] = useState(loadBag)
+  const [cartItems, setCartItems] = useState(() => resolveBagEntries(bagEntries))
   const [cartOpen, setCartOpen] = useState(false)
 
   const filteredProducts = useMemo(() => {
@@ -74,7 +93,7 @@ export default function App() {
       if (category === 'all') return true
       return category === 'new' ? product.isNew : product.category === category
     })
-  }, [query, category])
+  }, [query, category, products])
 
   const itemCount = cartCount(cartItems)
 
@@ -91,6 +110,13 @@ export default function App() {
       /* cart still works in memory when storage is unavailable */
     }
   }, [cartItems])
+
+  /* When the Supabase catalogue lands, re-resolve the saved bag so dashboard
+     prices — and shoes added only in Supabase — show up in the cart too. */
+  useEffect(() => {
+    if (catalogueSource !== 'cloud') return
+    setCartItems((current) => mergeBagLines(resolveBagEntries(bagEntries), current))
+  }, [catalogueSource, bagEntries])
 
   useEffect(() => {
     const locked = Boolean(selectedProduct) || cartOpen
@@ -132,7 +158,7 @@ export default function App() {
 
   const handleShopSimilar = useCallback(
     (post) => {
-      const product = post?.productId ? getProductById(post.productId) : null
+      const product = post?.productId ? getCatalogueProduct(post.productId) : null
       if (product) {
         setSelectedProduct(product)
         return
