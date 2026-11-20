@@ -140,6 +140,18 @@ Open `/admin` (or `#/admin`) and enter the PIN from `VITE_ADMIN_PIN`. The unlock
 5. Open `/admin` and check the status banner: *Supabase connected — orders are stored in the cloud* means the keys reached the build; *Local test mode* means they did not.
 6. Replace the placeholder in the **Live demo** section above with the Netlify URL.
 
+### Push the local `.env` to Netlify (fastest path)
+
+`netlify-env.mjs` copies the `VITE_*` values from your `.env` to the Netlify site, so the live PIN and keys always match your machine. It prints values masked, refuses to run without a PIN, and marks the variables non-secret (Vite can only inline non-secret values at build time).
+
+```powershell
+$env:NETLIFY_AUTH_TOKEN = Read-Host -AsSecureString | ConvertFrom-SecureString -AsPlainText
+npm run deploy:env                      # dry run: shows the site + the masked variables
+npm run deploy:env -- --apply --deploy  # write them, then rebuild the live site
+```
+
+The token is only read from `NETLIFY_AUTH_TOKEN` and never written to disk — delete it in Netlify → **User settings → Applications** once you are done.
+
 ### Setting the variables with the Netlify CLI
 
 ```bash
