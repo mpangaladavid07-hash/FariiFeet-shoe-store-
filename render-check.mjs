@@ -139,7 +139,7 @@ try {
       lang: 'en',
       element: h(ProductModal, { product: first, onClose: noop, onAddToCart: noop }),
       min: 2000,
-      probes: [first.name],
+      probes: [first.name, 'Select EU size', 'Select colour', 'Silver', 'EU 36 - 45'],
     },
     {
       name: 'CartDrawer',
@@ -160,7 +160,7 @@ try {
       lang: 'en',
       element: h(ProductCard, { product: first, onSelect: noop, onAddToCart: noop, index: 0 }),
       min: 1500,
-      probes: ['Add to bag', 'Select size', first.name],
+      probes: ['Add to bag', 'Select size', first.name, '36 - 45', 'Silver / White / Black'],
     },
     {
       name: 'AdminPage (locked)',

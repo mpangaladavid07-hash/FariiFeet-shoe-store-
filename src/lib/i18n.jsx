@@ -147,6 +147,8 @@ const en = {
     chooseSize: 'Choose EU size',
     quickNote: 'Goes straight to your bag. Pay on delivery.',
     quickAdd: 'Add {name} to your bag',
+    chooseColor: 'Choose colour',
+    pickColor: 'Choose colour {color}',
   },
   instagram: {
     eyebrow: 'Straight from the shop',
@@ -310,6 +312,9 @@ const en = {
     delivery3Note: 'Every pair checked by FariiFeet before it leaves us.',
     decreaseQty: 'Decrease quantity',
     increaseQty: 'Increase quantity',
+    selectColor: 'Select colour',
+    anyColor: 'Any colour',
+    pickColor: 'Choose colour {color}',
     noSizeMessage:
       'Hello FariiFeet 👋 I’d like to order the {name} ({colorway}). Please help me confirm my size.\n\nQuantity: {qty}\nTotal: {total}',
   },
@@ -585,6 +590,8 @@ const sw = {
     chooseSize: 'Chagua saizi ya EU',
     quickNote: 'Inakwenda moja kwa moja kwenye mfuko. Lipa uwasilishaji.',
     quickAdd: 'Weka {name} kwenye mfuko',
+    chooseColor: 'Chagua rangi',
+    pickColor: 'Chagua rangi {color}',
   },
   instagram: {
     eyebrow: 'Moja kwa moja kutoka dukani',
@@ -748,6 +755,9 @@ const sw = {
     delivery3Note: 'Kila jozi hukaguliwa na FariiFeet kabla ya kuondoka.',
     decreaseQty: 'Punguza idadi',
     increaseQty: 'Ongeza idadi',
+    selectColor: 'Chagua rangi',
+    anyColor: 'Rangi yoyote',
+    pickColor: 'Chagua rangi {color}',
     noSizeMessage:
       'Habari FariiFeet 👋 Ningependa kuagiza {name} ({colorway}). Tafadhali nisaidie kuthibitisha saizi yangu.\n\nIdadi: {qty}\nJumla: {total}',
   },

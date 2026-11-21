@@ -9,15 +9,15 @@ import ConciergeCTA from './components/ConciergeCTA'
 import Footer from './components/Footer'
 import ProductModal from './components/ProductModal'
 import CartDrawer from './components/CartDrawer'
-import { getCatalogueProduct, useCatalogue } from './lib/catalogue'
+import { cartLineId, getCatalogueProduct, useCatalogue } from './lib/catalogue'
 import { useI18n } from './lib/i18n'
 import { cartCount, whatsappLink } from './lib/store'
 import { WhatsAppIcon } from './components/Icons'
 
 const BAG_STORAGE_KEY = 'fariifeet-bag-v1'
 
-/* The bag is persisted as id + size + qty, never as prices, so a price edit in
-   the Supabase dashboard is picked up the next time the bag is hydrated. */
+/* The bag is persisted as id + size + colour + qty, never as prices, so a price
+   edit in the Supabase dashboard is picked up the next time the bag is hydrated. */
 function readBagEntries() {
   try {
     const raw = window.localStorage.getItem(BAG_STORAGE_KEY)
@@ -38,11 +38,13 @@ function resolveBagEntries(entries) {
       const size = Number(entry.size)
       if (!product || !qty) return null
       if (!(product.sizes || []).includes(size)) return null
+      const color = String(entry.color || '').trim()
       return {
         ...product,
         size,
+        color,
         qty: Math.min(10, Math.max(1, qty)),
-        lineId: entry.lineId || `${product.id}-${size}`,
+        lineId: entry.lineId || cartLineId(product.id, size, color),
       }
     })
     .filter(Boolean)
@@ -99,9 +101,10 @@ export default function App() {
 
   useEffect(() => {
     try {
-      const payload = cartItems.map(({ id, size, qty, lineId }) => ({
+      const payload = cartItems.map(({ id, size, qty, lineId, color }) => ({
         productId: id,
         size,
+        color: color || '',
         qty,
         lineId,
       }))
@@ -111,12 +114,13 @@ export default function App() {
     }
   }, [cartItems])
 
-  /* When the Supabase catalogue lands, re-resolve the saved bag so dashboard
-     prices — and shoes added only in Supabase — show up in the cart too. */
+  /* When the Supabase catalogue lands — and every time a Realtime edit
+     replaces it — re-resolve the saved bag so dashboard prices, colours and
+     shoes added only in Supabase show up in the cart too. */
   useEffect(() => {
     if (catalogueSource !== 'cloud') return
     setCartItems((current) => mergeBagLines(resolveBagEntries(bagEntries), current))
-  }, [catalogueSource, bagEntries])
+  }, [catalogueSource, products, bagEntries])
 
   useEffect(() => {
     const locked = Boolean(selectedProduct) || cartOpen
@@ -174,8 +178,9 @@ export default function App() {
     setCartOpen(true)
   }, [])
 
-  const addToCart = useCallback((product, size, qty) => {
-    const lineId = `${product.id}-${size}`
+  const addToCart = useCallback((product, size, qty, color = '') => {
+    const shade = String(color || '').trim()
+    const lineId = cartLineId(product.id, size, shade)
     setCartItems((current) => {
       const existing = current.find((item) => item.lineId === lineId)
       if (existing) {
@@ -183,7 +188,7 @@ export default function App() {
           item.lineId === lineId ? { ...item, qty: Math.min(10, item.qty + qty) } : item,
         )
       }
-      return [...current, { ...product, size, qty, lineId }]
+      return [...current, { ...product, size, color: shade, qty, lineId }]
     })
     setSelectedProduct(null)
     setCartOpen(true)

@@ -235,7 +235,10 @@ export function buildOrderMessage({
     const row = `${index + 1}. ${item.name} — EU ${item.size} × ${item.qty} — ${formatTZS(
       item.price * item.qty,
     )}`
-    return item.colorway ? `${row}\n   ${copy.colourway}: ${item.colorway}` : row
+    /* The colour the shopper actually picked wins over the product's full
+       colour list, so the shop knows which shade to pack. */
+    const shade = String(item.color || item.colorway || '').trim()
+    return shade ? `${row}\n   ${copy.colourway}: ${shade}` : row
   })
 
   const subtotal = cartSubtotal(items)
@@ -265,6 +268,7 @@ export function singleItemOrderMessage(product, size, qty, options = {}) {
     items: [
       {
         name: product.name,
+        color: options.color || '',
         colorway: product.colorway,
         size,
         qty,

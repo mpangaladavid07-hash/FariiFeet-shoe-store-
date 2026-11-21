@@ -1,9 +1,4 @@
-import {
-  ORDERS_STORAGE_KEY,
-  SUPABASE_ANON_KEY,
-  SUPABASE_URL,
-  isSupabaseConfigured,
-} from './config'
+import { ORDERS_STORAGE_KEY, SUPABASE_KEY, SUPABASE_URL, isSupabaseConfigured } from './config'
 import {
   CHECKOUT_PAYMENTS,
   DELIVERY_OPTIONS,
@@ -63,8 +58,8 @@ export function makeOrderId(date = new Date()) {
 /* ------------------------------------------------------------------ */
 
 const requestHeaders = (extra = {}) => ({
-  apikey: SUPABASE_ANON_KEY,
-  Authorization: `Bearer ${SUPABASE_ANON_KEY}`,
+  apikey: SUPABASE_KEY,
+  Authorization: `Bearer ${SUPABASE_KEY}`,
   'Content-Type': 'application/json',
   ...extra,
 })
@@ -214,6 +209,7 @@ export function buildOrder({ items, customer, delivery, payment, notes = '', lan
     items: items.map((item) => ({
       productId: item.id,
       name: item.name,
+      color: item.color || '',
       colorway: item.colorway || '',
       size: item.size,
       qty: item.qty,
@@ -339,7 +335,7 @@ export function orderSummaryText(order, lang = order.language || 'en') {
     ...items.map((item, index) =>
       label('item', {
         index: index + 1,
-        name: item.name,
+        name: item.color ? `${item.name} (${item.color})` : item.name,
         size: item.size,
         qty: item.qty,
         price: formatTZS(item.price * item.qty),

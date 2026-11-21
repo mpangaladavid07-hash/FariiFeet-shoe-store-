@@ -5,6 +5,10 @@
 -- `supabase/schema.sql`. Then run `supabase/seed-products.sql` to load the
 -- current eleven shoes so the shop looks exactly as it does today.
 --
+-- Prefer a single paste? Run `supabase_products_setup.sql` (repo root) instead:
+-- it creates this table with the shop-owner columns size_range /
+-- available_colors / in_stock, turns on Realtime and seeds the same 21 shoes.
+--
 -- After that the storefront reads this table instead of `src/data/products.js`:
 -- edit `price`, `image_url`, `category`, `is_new` or `is_active` in the
 -- Supabase Table Editor and the live site follows on the next page load.

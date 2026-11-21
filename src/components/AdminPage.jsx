@@ -98,10 +98,13 @@ function OrderCard({ order, t, lang, busy, onStatusChange }) {
       <ul className="mt-3 space-y-1 border-t border-blushline pt-2.5">
         {order.items.map((item) => (
           <li
-            key={`${item.productId || item.name}-${item.size}`}
+            key={`${item.productId || item.name}-${item.size}-${item.color || ''}`}
             className="flex items-baseline justify-between gap-2 text-[11px]"
           >
-            <span className="min-w-0 truncate text-plum">{item.name}</span>
+            <span className="min-w-0 truncate text-plum">
+              {item.name}
+              {item.color ? ` · ${item.color}` : ''}
+            </span>
             <span className="shrink-0 font-chat text-[10px] text-plum-soft">
               {t('admin.sizeQty', { size: item.size, qty: item.qty })}
             </span>

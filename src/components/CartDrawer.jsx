@@ -126,11 +126,14 @@ function CartItem({ item, onUpdateQty, onRemove, t }) {
           <div className="min-w-0">
             <p className="font-chat text-[10px] font-semibold uppercase tracking-[0.14em] text-plum-soft">
               EU {item.size}
+              {item.color ? ` · ${item.color}` : ''}
             </p>
             <h3 className="mt-1 truncate font-display text-[13px] font-bold leading-snug text-plum">
               {item.name}
             </h3>
-            <p className="mt-0.5 truncate text-[10px] text-plum-soft">{item.colorway}</p>
+            <p className="mt-0.5 truncate text-[10px] text-plum-soft">
+              {item.color || item.colorway}
+            </p>
           </div>
           <button
             type="button"
@@ -492,6 +495,7 @@ export function OrderReceipt({ order, t, lang, onClose, dispatched = false }) {
                 </p>
                 <p className="mt-0.5 font-chat text-[10px] text-plum-soft">
                   EU {item.size} x {item.qty}
+                  {item.color ? ` · ${item.color}` : ''}
                 </p>
               </div>
               <p className="shrink-0 font-chat text-[11px] font-semibold text-plum">

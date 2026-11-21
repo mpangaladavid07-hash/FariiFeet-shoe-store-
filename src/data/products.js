@@ -386,3 +386,39 @@ export const isSizeAvailable = (product, size) =>
 export const availableSizeCount = (product) =>
   getSizeOptions(product).filter((size) => isSizeAvailable(product, size)).length
 
+/**
+ * Colours a shopper can pick. Catalogue rows from Supabase carry a parsed
+ * `colors` array; the built-in list only has a `colorway` string such as
+ * `"Silver / White / Black"`, so it is split on the usual separators.
+ */
+export const getColorOptions = (product) => {
+  const explicit = Array.isArray(product?.colors) ? product.colors.filter(Boolean) : []
+  if (explicit.length) return explicit
+  return String(product?.colorway || '')
+    .split(/\s*[,;/|]\s*/)
+    .map((part) => part.trim())
+    .filter(Boolean)
+}
+
+/** `"38 - 45"`, `"27 - 36"`, or the single size of a one-size pair. */
+export const getSizeRangeLabel = (product) => {
+  const label = String(product?.sizeRange || '').trim()
+  if (label) return label
+  const sizes = getSizeOptions(product)
+  if (!sizes.length) return ''
+  return sizes.length === 1 ? String(sizes[0]) : `${sizes[0]} - ${sizes[sizes.length - 1]}`
+}
+
+/** False when `in_stock` is switched off in Supabase, or when every size is sold out. */
+export const isProductInStock = (product) =>
+  product?.inStock !== false && availableSizeCount(product) > 0
+
+/**
+ * Title-case label for a category the owner typed in Supabase that has no
+ * translation yet, e.g. `'loafers'` → `'Loafers'`, `'kids-shoes'` → `'Kids Shoes'`.
+ */
+export const categoryLabel = (category) =>
+  String(category || '')
+    .replace(/[-_]+/g, ' ')
+    .replace(/\b\w/g, (letter) => letter.toUpperCase())
+

@@ -1,7 +1,7 @@
 # Netlify build settings for the Fariifeet Shoe Store storefront.
 #
 # Secrets are deliberately NOT stored here: VITE_ADMIN_PIN, VITE_SUPABASE_URL,
-# VITE_SUPABASE_ANON_KEY and the optional FeedFusion keys live in the Netlify
+# VITE_SUPABASE_PUBLISHABLE_KEY and the optional FeedFusion keys live in the Netlify
 # dashboard (Site configuration -> Environment variables) so nothing sensitive
 # ever reaches this repository. See README -> "Deploying to Netlify".
 #

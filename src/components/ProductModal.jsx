@@ -1,5 +1,12 @@
 import { useEffect, useRef, useState } from 'react'
-import { availableSizeCount, isSizeAvailable } from '../data/products'
+import {
+  availableSizeCount,
+  categoryLabel,
+  getColorOptions,
+  getSizeRangeLabel,
+  isProductInStock,
+  isSizeAvailable,
+} from '../data/products'
 import { formatTZS, singleItemOrderMessage, whatsappLink } from '../lib/store'
 import { useI18n } from '../lib/i18n'
 import {
@@ -18,12 +25,14 @@ import {
 export default function ProductModal({ product, onClose, onAddToCart }) {
   const { t, lang } = useI18n()
   const [size, setSize] = useState(null)
+  const [color, setColor] = useState('')
   const [qty, setQty] = useState(1)
   const [error, setError] = useState('')
   const closeRef = useRef(null)
 
   useEffect(() => {
     setSize(null)
+    setColor('')
     setQty(1)
     setError('')
     closeRef.current?.focus()
@@ -43,12 +52,20 @@ export default function ProductModal({ product, onClose, onAddToCart }) {
   if (!product) return null
 
   const inStockCount = availableSizeCount(product)
+  const inStock = isProductInStock(product)
+  const colors = getColorOptions(product)
+  const activeColor = colors.includes(color) ? color : colors[0] || ''
+  const sizeRange = getSizeRangeLabel(product)
+  const categoryKey = `category.${product.category}`
+  const translatedCategory = t(categoryKey)
+  const categoryName =
+    translatedCategory === categoryKey ? categoryLabel(product.category) : translatedCategory
   const total = product.price * qty
   const whatsappMessage = size
-    ? singleItemOrderMessage(product, size, qty, { lang })
+    ? singleItemOrderMessage(product, size, qty, { lang, color: activeColor })
     : t('modal.noSizeMessage', {
         name: product.name,
-        colorway: product.colorway,
+        colorway: activeColor || product.colorway,
         qty,
         total: formatTZS(total),
       })
@@ -59,13 +76,8 @@ export default function ProductModal({ product, onClose, onAddToCart }) {
       return
     }
     setError('')
-    onAddToCart(product, size, qty)
+    onAddToCart(product, size, qty, activeColor)
   }
-
-  const sizeRange = t('modal.sizeRange', {
-    from: product.sizes[0],
-    to: product.sizes[product.sizes.length - 1],
-  })
 
   return (
     <div className="fixed inset-0 z-[70] flex items-stretch justify-center sm:items-center sm:p-5">
@@ -106,7 +118,7 @@ export default function ProductModal({ product, onClose, onAddToCart }) {
               </span>
             )}
             <span className="rounded-full border border-white/20 bg-obsidian/45 px-2.5 py-1 text-[9px] font-semibold uppercase tracking-[0.18em] text-white backdrop-blur-md">
-              {t(`category.${product.category}`)}
+              {categoryName}
             </span>
           </div>
 
@@ -129,7 +141,7 @@ export default function ProductModal({ product, onClose, onAddToCart }) {
         <div className="flex-1 overflow-y-auto overscroll-contain p-5 pb-8 sm:p-7 lg:p-9">
           <div className="pr-10">
             <p className="font-chat text-[10px] font-semibold uppercase tracking-[0.24em] text-[#B3687F] dark:text-blush">
-              {product.badge} · {t('modal.inStock')}
+              {product.badge} · {inStock ? t('modal.inStock') : t('common.soldOut')}
             </p>
             <h2
               id="product-modal-title"
@@ -181,7 +193,12 @@ export default function ProductModal({ product, onClose, onAddToCart }) {
                 </p>
               </div>
               <span className="rounded border border-blushline px-2 py-1 font-chat text-[9px] uppercase tracking-[0.14em] text-plum-soft">
-                {sizeRange}
+                {sizeRange
+                  ? `EU ${sizeRange}`
+                  : t('modal.sizesInStock', {
+                      available: inStockCount,
+                      total: product.sizes.length,
+                    })}
               </span>
             </div>
             <div className="mt-4 grid grid-cols-5 gap-2">
@@ -217,6 +234,40 @@ export default function ProductModal({ product, onClose, onAddToCart }) {
               })}
             </div>
 
+            {colors.length > 0 && (
+              <div className="mt-6">
+                <div className="flex items-end justify-between gap-3">
+                  <h3 className="font-chat text-[11px] font-bold uppercase tracking-[0.2em] text-plum">
+                    {t('modal.selectColor')}
+                  </h3>
+                  <span className="font-chat text-[10px] uppercase tracking-[0.12em] text-plum-soft">
+                    {activeColor || t('modal.anyColor')}
+                  </span>
+                </div>
+                <div className="mt-3 flex flex-wrap gap-2">
+                  {colors.map((shade) => {
+                    const active = shade === activeColor
+                    return (
+                      <button
+                        key={shade}
+                        type="button"
+                        onClick={() => setColor(shade)}
+                        aria-pressed={active}
+                        aria-label={t('modal.pickColor', { color: shade })}
+                        className={`rounded-full border px-3 py-2 font-chat text-[11px] font-semibold transition-all duration-200 ${
+                          active
+                            ? 'border-plum bg-plum text-shell shadow-soft'
+                            : 'border-blushline bg-panel text-plum hover:border-plum/40 hover:bg-shell-soft'
+                        }`}
+                      >
+                        {shade}
+                      </button>
+                    )
+                  })}
+                </div>
+              </div>
+            )}
+
             {error && (
               <p className="mt-3 rounded-xl border border-[#D79BAC] bg-blush/30 px-3 py-2 text-[11px] font-medium text-plum">
                 {error}
@@ -251,10 +302,11 @@ export default function ProductModal({ product, onClose, onAddToCart }) {
               <button
                 type="button"
                 onClick={handleAdd}
-                className="btn-plum h-12 flex-1 gap-2 !px-4"
+                disabled={!inStock}
+                className="btn-plum h-12 flex-1 gap-2 !px-4 disabled:cursor-not-allowed disabled:opacity-50"
               >
                 <BagIcon className="h-4 w-4" />
-                <span>{t('modal.addToBag')}</span>
+                <span>{inStock ? t('modal.addToBag') : t('common.soldOut')}</span>
                 <span className="hidden font-chat text-[10px] font-bold opacity-70 sm:inline">
                   {formatTZS(total)}
                 </span>

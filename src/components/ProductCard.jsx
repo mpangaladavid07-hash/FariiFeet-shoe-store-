@@ -1,5 +1,13 @@
 import { useState } from 'react'
-import { availableSizeCount, getSizeOptions, isSizeAvailable } from '../data/products'
+import {
+  availableSizeCount,
+  categoryLabel,
+  getColorOptions,
+  getSizeOptions,
+  getSizeRangeLabel,
+  isProductInStock,
+  isSizeAvailable,
+} from '../data/products'
 import { useI18n } from '../lib/i18n'
 import { formatTZS } from '../lib/store'
 import { ArrowUpRightIcon, BagIcon, CloseIcon, StarIcon } from './Icons'
@@ -7,9 +15,18 @@ import { ArrowUpRightIcon, BagIcon, CloseIcon, StarIcon } from './Icons'
 export default function ProductCard({ product, onSelect, onAddToCart, index = 0 }) {
   const { t } = useI18n()
   const [picking, setPicking] = useState(false)
+  const [color, setColor] = useState('')
   const sizesInStock = availableSizeCount(product)
-  const hasSomeStock = sizesInStock > 0
   const sizes = getSizeOptions(product)
+  const colors = getColorOptions(product)
+  const sizeRange = getSizeRangeLabel(product)
+  /* Keep the picked shade valid when a Realtime edit changes the colour list. */
+  const activeColor = colors.includes(color) ? color : colors[0] || ''
+  const hasSomeStock = isProductInStock(product)
+  const categoryKey = `category.${product.category}`
+  const translatedCategory = t(categoryKey)
+  const categoryName =
+    translatedCategory === categoryKey ? categoryLabel(product.category) : translatedCategory
 
   return (
     <article
@@ -53,8 +70,15 @@ export default function ProductCard({ product, onSelect, onAddToCart, index = 0 
           </div>
 
           <div className="absolute inset-x-0 bottom-0 flex items-end justify-between gap-1.5 p-2.5 sm:p-3">
-            <span className="rounded-full border border-white/20 bg-obsidian/45 px-2.5 py-1.5 text-[10px] font-bold tracking-wide text-rose backdrop-blur-md sm:text-xs">
-              {formatTZS(product.price)}
+            <span className="flex flex-col items-start gap-1.5">
+              <span className="rounded-full border border-white/20 bg-obsidian/45 px-2.5 py-1.5 text-[10px] font-bold tracking-wide text-rose backdrop-blur-md sm:text-xs">
+                {formatTZS(product.price)}
+              </span>
+              {sizeRange && (
+                <span className="rounded-full border border-white/15 bg-obsidian/40 px-2 py-1 font-chat text-[8px] font-semibold uppercase tracking-[0.12em] text-rose/90 backdrop-blur-md sm:text-[9px]">
+                  EU {sizeRange}
+                </span>
+              )}
             </span>
             <span className="flex items-center gap-1 rounded-full border border-white/15 bg-obsidian/55 px-2.5 py-1.5 text-[9px] font-semibold uppercase tracking-[0.12em] text-rose backdrop-blur-md transition-all duration-300 group-hover:border-blush group-hover:bg-blush group-hover:text-obsidian sm:gap-1.5 sm:px-3">
               {t('card.selectSize')}
@@ -74,7 +98,7 @@ export default function ProductCard({ product, onSelect, onAddToCart, index = 0 
           <div className="flex items-start justify-between gap-2">
             <div className="min-w-0">
               <p className="text-[9px] font-semibold uppercase tracking-[0.2em] text-plum/60">
-                {t(`category.${product.category}`)}
+                {categoryName}
                 {product.badge === 'Kids' && ` · ${t('card.kids')}`}
               </p>
               <h3 className="mt-1 truncate font-display text-[13px] font-bold leading-snug text-plum sm:text-[15px]">
@@ -98,9 +122,7 @@ export default function ProductCard({ product, onSelect, onAddToCart, index = 0 
             </p>
           ) : (
             <p className="mt-1 text-[10px] text-plum-soft/80">
-              {isSizeAvailable(product, product.sizes[0])
-                ? t('card.readyToShip')
-                : t('card.limitedStock')}
+              {hasSomeStock ? t('card.readyToShip') : t('common.soldOut')}
             </p>
           )}
         </div>
@@ -112,11 +134,12 @@ export default function ProductCard({ product, onSelect, onAddToCart, index = 0 
             <button
               type="button"
               onClick={() => setPicking(true)}
+              disabled={!hasSomeStock}
               aria-label={t('card.quickAdd', { name: product.name })}
-              className="flex h-9 w-full items-center justify-center gap-1.5 rounded-full border border-blushline bg-panel text-[9px] font-bold uppercase tracking-[0.14em] text-plum transition hover:border-plum/40 hover:bg-shell-soft sm:text-[10px]"
+              className="flex h-9 w-full items-center justify-center gap-1.5 rounded-full border border-blushline bg-panel text-[9px] font-bold uppercase tracking-[0.14em] text-plum transition hover:border-plum/40 hover:bg-shell-soft disabled:cursor-not-allowed disabled:opacity-50 disabled:hover:border-blushline disabled:hover:bg-panel sm:text-[10px]"
             >
               <BagIcon className="h-3.5 w-3.5" />
-              {t('card.addToBag')}
+              {hasSomeStock ? t('card.addToBag') : t('common.soldOut')}
             </button>
           ) : (
             <div className="rounded-2xl border border-blushline bg-panel p-2">
@@ -144,7 +167,7 @@ export default function ProductCard({ product, onSelect, onAddToCart, index = 0 
                       disabled={soldOut}
                       onClick={() => {
                         setPicking(false)
-                        onAddToCart(product, size, 1)
+                        onAddToCart(product, size, 1, activeColor)
                       }}
                       aria-label={
                         soldOut
@@ -162,6 +185,35 @@ export default function ProductCard({ product, onSelect, onAddToCart, index = 0 
                   )
                 })}
               </div>
+
+              {colors.length > 1 && (
+                <>
+                  <p className="pl-1 pt-2 font-chat text-[9px] font-semibold uppercase tracking-[0.1em] text-plum-soft">
+                    {t('card.chooseColor')}
+                  </p>
+                  <div className="flex flex-wrap gap-1 pt-1">
+                    {colors.map((shade) => {
+                      const active = shade === activeColor
+                      return (
+                        <button
+                          key={shade}
+                          type="button"
+                          onClick={() => setColor(shade)}
+                          aria-pressed={active}
+                          aria-label={t('card.pickColor', { color: shade })}
+                          className={`rounded-full border px-2 py-1 text-[9px] font-semibold transition ${
+                            active
+                              ? 'border-plum bg-plum text-shell'
+                              : 'border-blushline bg-shell-soft text-plum-soft hover:border-plum/40 hover:text-plum'
+                          }`}
+                        >
+                          {shade}
+                        </button>
+                      )
+                    })}
+                  </div>
+                </>
+              )}
 
               <p className="pl-1 pt-1.5 text-[9px] leading-snug text-plum-soft">
                 {t('card.quickNote')}
