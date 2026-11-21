@@ -3,6 +3,12 @@
 //   node orders-check.mjs        (or: npm run check:orders)
 import { createServer } from 'vite'
 
+/* The shopping bag must fall back to localStorage deterministically, so pin the
+   Supabase env empty for this file (Vite's loadEnv() lets process.env win). */
+process.env.VITE_SUPABASE_URL = ''
+process.env.VITE_SUPABASE_PUBLISHABLE_KEY = ''
+process.env.VITE_SUPABASE_ANON_KEY = ''
+
 const vite = await createServer({
   server: { middlewareMode: true, hmr: false, watch: null },
   appType: 'custom',

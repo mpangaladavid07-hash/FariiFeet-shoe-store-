@@ -16,6 +16,7 @@ const PUSHED_KEYS = [
   'VITE_WHATSAPP_NUMBER',
   'VITE_ADMIN_PIN',
   'VITE_SUPABASE_URL',
+  'VITE_SUPABASE_PUBLISHABLE_KEY',
   'VITE_SUPABASE_ANON_KEY',
   'VITE_FEEDFUSION_URL',
   'VITE_FEEDFUSION_KEY',
@@ -94,6 +95,33 @@ const api = async (path, init = {}) => {
 }
 
 const env = readEnv()
+
+/* A secret key in a VITE_ variable would be inlined into the public bundle, so
+   refuse to push one even if it was pasted in by mistake. */
+for (const [name, value] of Object.entries(env)) {
+  if (!name.startsWith('VITE_') || !value) continue
+  if (/^sb_secret_/i.test(value)) {
+    fail(
+      `${name} holds an sb_secret_ key. Vite would publish it in the browser bundle — ` +
+        'use the publishable (or anon) key and keep the secret key in SUPABASE_SERVICE_ROLE_KEY.',
+    )
+  }
+  const parts = value.split('.')
+  if (parts.length === 3) {
+    try {
+      const payload = JSON.parse(Buffer.from(parts[1], 'base64url').toString('utf8'))
+      if (payload?.role === 'service_role') {
+        fail(
+          `${name} holds a service_role JWT. Vite would publish it in the browser bundle — ` +
+            'use the publishable (or anon) key and keep the service role in SUPABASE_SERVICE_ROLE_KEY.',
+        )
+      }
+    } catch {
+      /* not a JWT — nothing to check */
+    }
+  }
+}
+
 const wanted = [
   ...PUSHED_KEYS.map((key) => ({
     key,
