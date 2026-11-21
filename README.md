@@ -350,7 +350,7 @@ Each imported post becomes one `products` row, so it is instantly a normal produ
 
 ### Push the local `.env` to Netlify (fastest path)
 
-`netlify-env.mjs` copies the values from your `.env` to the Netlify site, so the live PIN and keys always match your machine. `VITE_*` values are pushed as non-secret (Vite can only inline non-secret values at build time); `SUPABASE_*` and `INSTAGRAM_*` values are pushed as **secrets** with the **Functions** scope, which is what the importer needs. It prints values masked and refuses to run without a PIN.
+`netlify-env.mjs` copies the values from your `.env` to the Netlify site, so the live PIN and keys always match your machine. `VITE_*` values are pushed as non-secret (Vite can only inline non-secret values at build time); `SUPABASE_*` and `INSTAGRAM_*` values are pushed as **secrets** with the **Functions** scope, which is what the importer needs. It prints values masked and refuses to run without a PIN. After writing it re-reads the site, and if any variable did not stick it stops **without** triggering a deploy — so a build never runs on a half-applied `.env`.
 
 ```powershell
 $env:NETLIFY_AUTH_TOKEN = Read-Host -AsSecureString | ConvertFrom-SecureString -AsPlainText

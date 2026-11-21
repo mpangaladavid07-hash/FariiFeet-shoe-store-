@@ -184,6 +184,8 @@ const current = new Map(
   (Array.isArray(existing.body) ? existing.body : []).map((entry) => [entry.key, entry]),
 )
 
+const writeFailed = []
+
 for (const { key, value, secret, scopes } of wanted) {
   const payload = {
     key,
@@ -192,6 +194,10 @@ for (const { key, value, secret, scopes } of wanted) {
     values: [{ value, context: 'all' }],
   }
   const found = current.get(key)
+  /* PUT takes the key in the path and one object; POST exists only to create
+     and its body is an ARRAY of variables (OpenAPI createEnvVars -> env_vars:
+     array). A bare object is rejected, and that used to leave every new
+     variable silently unset — the build then ran on the old values. */
   const result = found
     ? await api(`/accounts/${account}/env/${encodeURIComponent(key)}?site_id=${site.id}`, {
         method: 'PUT',
@@ -199,16 +205,20 @@ for (const { key, value, secret, scopes } of wanted) {
       })
     : await api(`/accounts/${account}/env?site_id=${site.id}`, {
         method: 'POST',
-        body: JSON.stringify(payload),
+        body: JSON.stringify([payload]),
       })
   console.log(`  ${result.ok ? 'OK  ' : 'FAIL'} ${found ? 'updated' : 'created'} ${key}`)
-  if (!result.ok) console.log(`       HTTP ${result.status} ${JSON.stringify(result.body)}`)
+  if (!result.ok) {
+    writeFailed.push(key)
+    console.log(`       HTTP ${result.status} ${JSON.stringify(result.body)}`)
+  }
 }
 
 const after = await api(`/accounts/${account}/env?site_id=${site.id}`)
 const stored = new Map(
   (Array.isArray(after.body) ? after.body : []).map((entry) => [entry.key, entry]),
 )
+const missing = []
 console.log('\nStored on Netlify (values masked):')
 for (const { key, secret } of wanted) {
   const entry = stored.get(key)
@@ -220,7 +230,19 @@ for (const { key, secret } of wanted) {
         ? 'set (secret, not readable)'
         : 'set'
     : 'not readable'
+  if (!entry) missing.push(key)
   console.log(`  ${entry ? 'OK  ' : 'MISS'} ${key.padEnd(26)} ${state}`)
+}
+
+/* A build that is missing these variables silently falls back to the local
+   catalogue and the default PIN, so never trigger a deploy on a partial push. */
+const notApplied = [...new Set([...writeFailed, ...missing])]
+if (notApplied.length) {
+  fail(
+    'These variables are not on the Netlify site, so the next build would run without them:\n' +
+      notApplied.map((key) => `  ${key}`).join('\n') +
+      '\nFix the HTTP errors above, then re-run with --apply. No deploy was triggered.',
+  )
 }
 
 if (deploy) {
