@@ -45,7 +45,7 @@ Copy `.env.example` to `.env` (git-ignored) and fill in:
 VITE_SUPABASE_URL=https://bcgstfeotcuytnoxctoc.supabase.co
 VITE_SUPABASE_PUBLISHABLE_KEY=sb_publishable_…
 # legacy projects: VITE_SUPABASE_ANON_KEY=<anon public JWT>
-VITE_ADMIN_PIN=1234
+VITE_ADMIN_PIN=2007
 ```
 
 Then run `npm run check:supabase` — it calls the live project and lists any
@@ -58,7 +58,7 @@ vars at start-up). The order desk badge switches from "Local test mode" to
 - Open `http://localhost:5173/admin` (or `/admin` on the deployed domain).
   If your host does not rewrite unknown paths to `index.html`, use
   `https://your-domain.com/#/admin` instead — both are recognised.
-- Enter the PIN from `VITE_ADMIN_PIN` (default `1234`).
+- Enter the PIN from `VITE_ADMIN_PIN` (default `2007`).
 - Each card shows the order ID, customer name, phone (tap to call), delivery
   area, payment method, sizes and total.
 - Move an order through **Pending → Out for delivery → Delivered & Paid**.

@@ -119,7 +119,7 @@ npm run dev
 ```
 
 - Storefront: <http://localhost:5173>
-- Order desk: <http://localhost:5173/admin> (PIN from `VITE_ADMIN_PIN`; if the variable is missing the desk falls back to `1234`, so set it before going live)
+- Order desk: <http://localhost:5173/admin> (PIN `2007`; `VITE_ADMIN_PIN` overrides it)
 
 ### 5. Build for production
 
@@ -336,7 +336,7 @@ Each imported post becomes one `products` row, so it is instantly a normal produ
    | Variable | Value |
    | --- | --- |
    | `VITE_WHATSAPP_NUMBER` | `255754623904` |
-   | `VITE_ADMIN_PIN` | the private order-desk PIN (never commit it; the repo only carries the `1234` dev fallback) |
+   | `VITE_ADMIN_PIN` | the order-desk PIN — `2007` is the shop default baked into the app; set it here only to rotate the PIN without a code change |
    | `VITE_SUPABASE_URL` | `https://<project-ref>.supabase.co` |
    | `VITE_SUPABASE_PUBLISHABLE_KEY` | the project's **Publishable key** (`sb_publishable_…`) from Supabase → Project settings → API keys — or the legacy **anon public** JWT as `VITE_SUPABASE_ANON_KEY` |
    | `VITE_FEEDFUSION_URL`, `VITE_FEEDFUSION_KEY` | optional Instagram feed |

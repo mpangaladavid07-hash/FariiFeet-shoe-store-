@@ -1,9 +1,11 @@
 # Netlify build settings for the Fariifeet Shoe Store storefront.
 #
-# Secrets are deliberately NOT stored here: VITE_ADMIN_PIN, VITE_SUPABASE_URL,
-# VITE_SUPABASE_PUBLISHABLE_KEY and the optional FeedFusion keys live in the Netlify
-# dashboard (Site configuration -> Environment variables) so nothing sensitive
-# ever reaches this repository. See README -> "Deploying to Netlify".
+# Secrets are deliberately NOT stored here: the Supabase keys, the optional
+# FeedFusion keys and the Instagram tokens live in the Netlify dashboard (Site
+# configuration -> Environment variables), scoped to the build or the functions.
+# The order-desk PIN has a shop default in `src/lib/config.js` and can be rotated
+# with `VITE_ADMIN_PIN` in the dashboard, no code change needed.
+# See README -> "Deploying to Netlify".
 #
 # The Instagram importer additionally needs server-only variables (see README ->
 # "Instagram -> catalogue"): SUPABASE_SERVICE_ROLE_KEY, INSTAGRAM_ACCESS_TOKEN,

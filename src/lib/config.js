@@ -84,17 +84,18 @@ export const ORDERS_TABLE = 'orders'
 export const PRODUCTS_TABLE = 'products'
 
 /**
- * PIN for the hidden /admin order desk. Set `VITE_ADMIN_PIN` in `.env` locally
- * and in the Netlify environment for the deployed site; the `1234` fallback
- * below only exists so the desk still opens on a fresh clone with no `.env`.
+ * PIN for the hidden /admin order desk. `VITE_ADMIN_PIN` (in `.env` locally and
+ * in the Netlify environment) overrides it; when that variable is missing the
+ * desk falls back to the shop PIN below, so a Git-triggered build still opens
+ * with the right code.
  */
 const configuredPin = String(import.meta.env.VITE_ADMIN_PIN || '').trim()
 
 if (!configuredPin && import.meta.env.DEV) {
-  console.warn('[fariifeet] VITE_ADMIN_PIN is not set — the order desk falls back to 1234.')
+  console.warn('[fariifeet] VITE_ADMIN_PIN is not set — the order desk falls back to 2007.')
 }
 
-export const ADMIN_PIN = configuredPin || '1234'
+export const ADMIN_PIN = configuredPin || '2007'
 
 /** Storage keys shared by the bag, the order desk and the admin session. */
 export const ORDERS_STORAGE_KEY = 'fariifeet-orders-v1'
