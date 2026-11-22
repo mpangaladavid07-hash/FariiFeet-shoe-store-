@@ -3,7 +3,7 @@
 -- ===========================================================================
 --
 -- HOW TO USE
---   1. Open https://supabase.com/dashboard/project/bcgstfeotcuytnoxctoc
+--   1. Open https://supabase.com/dashboard/project/<project-ref>
 --   2. Left sidebar -> SQL Editor -> "+ New query"
 --   3. Paste this whole file, press "Run" (or Ctrl/Cmd + Enter)
 --   4. Open Table Editor -> public.products: edit name / size_range /

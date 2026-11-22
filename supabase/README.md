@@ -7,8 +7,8 @@ Supabase keys every order is stored in the browser's `localStorage`, the desk
 reads that same list, and the built-in catalogue in `src/data/products.js` is
 shown.
 
-The shop's live project is `bcgstfeotcuytnoxctoc`
-(<https://bcgstfeotcuytnoxctoc.supabase.co>). Run these files in the SQL
+The shop's live project ref is the subdomain of its project URL
+(`https://<project-ref>.supabase.co`), kept in the Netlify environment variables rather than in the repo. Run these files in the SQL
 editor, in this order, on a fresh project:
 
 | File | What it creates |
@@ -42,7 +42,7 @@ it, then either run it after `schema.sql` or promote it into `schema.sql`.
 Copy `.env.example` to `.env` (git-ignored) and fill in:
 
 ```env
-VITE_SUPABASE_URL=https://bcgstfeotcuytnoxctoc.supabase.co
+VITE_SUPABASE_URL=https://<project-ref>.supabase.co
 VITE_SUPABASE_PUBLISHABLE_KEY=sb_publishable_…
 # legacy projects: VITE_SUPABASE_ANON_KEY=<anon public JWT>
 VITE_ADMIN_PIN=2007
