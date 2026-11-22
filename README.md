@@ -330,7 +330,7 @@ Each imported post becomes one `products` row, so it is instantly a normal produ
 
 ## Deploying to Netlify
 
-1. Connect the GitHub repository to Netlify. `netlify.toml` already sets the build command (`npm run build`), the publish directory (`dist`), Node 20, the Instagram function directory/schedule and the SPA rewrite that lets `/admin` load when opened or refreshed directly.
+1. Connect the GitHub repository to Netlify. `netlify.toml` already sets the build command (`npm run build`), the publish directory (`dist`), Node 20, the Instagram function directory/schedule and the SPA rewrite that lets `/admin` load when opened or refreshed directly. It also answers missing `/assets/*`, `/images/*` and `/shoes/*` files with a real `404` (the branded `public/404.html`) instead of the SPA shell, caches hashed bundles as immutable and makes `index.html` revalidate on every visit.
 2. Add these under **Site configuration → Environment variables** (scope *All* so both production and deploy previews get them):
 
    | Variable | Value |
@@ -347,6 +347,15 @@ Each imported post becomes one `products` row, so it is instantly a normal produ
 4. **Trigger a fresh deploy** — Vite inlines `VITE_*` values at build time, so existing builds keep the old settings until they are rebuilt.
 5. Open `/admin` and check the status banner: *Supabase connected — orders are stored in the cloud* means the keys reached the build; *Local test mode* means they did not.
 6. Replace the placeholder in the **Live demo** section above with the Netlify URL.
+
+### If the deploy renders unstyled (giant SVGs, no layout)
+
+The page HTML loaded but `/assets/*.css` did not apply. Check, in this order:
+
+1. **DevTools → Network** → reload with *Disable cache*. The stylesheet must return `200` with `Content-Type: text/css`. A `200` with `Content-Type: text/html` means the request fell through to the SPA rewrite — that happens when the hash in the loaded `index.html` is not in the current deploy (stale cached HTML). `netlify.toml` now sends those requests to `404.html` instead, and sets `index.html` to `max-age=0, must-revalidate`.
+2. Confirm the build really published CSS: `npm run build` then `Get-ChildItem dist\assets\*.css`. A healthy build always prints `dist/assets/index-<hash>.css` (~49 kB).
+3. Confirm the deploy is the newest one (Netlify → **Deploys**): a failed build — for example a blocked secrets scan — leaves the previous deploy live.
+4. A `401` on the site URL means Netlify password protection is on; log in first, otherwise every asset request is rejected as well.
 
 ### Push the local `.env` to Netlify (fastest path)
 

@@ -39,10 +39,44 @@
   to = "/.netlify/functions/instagram-sync"
   status = 200
 
+# Static files must never be answered with index.html. Netlify already serves a
+# file that exists before any rewrite (these rules have no `force`), but a
+# *missing* asset — e.g. a hashed /assets/*.css left over in a cached page after
+# a redeploy — would otherwise fall through to the SPA rule and come back as
+# HTML with status 200. Browsers refuse a stylesheet with the wrong MIME type,
+# so the whole page renders unstyled. A real 404 makes that obvious instead.
+[[redirects]]
+  from = "/assets/*"
+  to = "/404.html"
+  status = 404
+
+[[redirects]]
+  from = "/images/*"
+  to = "/404.html"
+  status = 404
+
+[[redirects]]
+  from = "/shoes/*"
+  to = "/404.html"
+  status = 404
+
 # Single-page app: unknown paths are served index.html (status 200) so the
 # client-side /admin order desk loads when opened or refreshed directly.
 [[redirects]]
   from = "/*"
   to = "/index.html"
   status = 200
+
+# Hashed bundles are immutable, so cache them hard. index.html must always
+# revalidate, otherwise a browser can keep HTML that points at a CSS hash the
+# new deploy no longer publishes (the unstyled-page failure described above).
+[[headers]]
+  for = "/assets/*"
+  [headers.values]
+    Cache-Control = "public, max-age=31536000, immutable"
+
+[[headers]]
+  for = "/index.html"
+  [headers.values]
+    Cache-Control = "public, max-age=0, must-revalidate"
 
