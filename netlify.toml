@@ -18,6 +18,11 @@
 
 [build.environment]
   NODE_VERSION = "20"
+  # The project URL is public: Vite inlines VITE_SUPABASE_URL into the bundle on
+  # purpose (see src/lib/config.js), so the same string in SUPABASE_URL tripped
+  # Netlify's secret scanner and failed the deploy. Omitting that one key keeps
+  # the scan on for real secrets (SUPABASE_SERVICE_ROLE_KEY, INSTAGRAM_* …).
+  SECRETS_SCAN_OMIT_KEYS = "SUPABASE_URL"
 
 # Serverless functions (Instagram -> catalogue importer). Shared code lives in
 # netlify/lib/, outside this directory, so only real endpoints get deployed.
