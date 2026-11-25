@@ -18,6 +18,8 @@
     "preview": "vite preview --port 4173 --strictPort",
     "instagram:sync": "node run-instagram-sync.mjs",
     "instagram:sync:dry": "node run-instagram-sync.mjs --dry-run",
+    "products:push": "node supabase-push-new-arrivals.mjs",
+    "products:push:dry": "node supabase-push-new-arrivals.mjs --dry-run",
     "deploy:env": "node netlify-env.mjs"
   },
   "dependencies": {

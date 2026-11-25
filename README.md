@@ -61,7 +61,8 @@ src/
 supabase_products_setup.sql          products + 21 seed rows + RLS + Realtime (one paste)
 supabase/schema.sql                orders table + RLS, for cloud storage
 supabase/products.sql              legacy two-step version of the products table
-supabase/seed-products.sql         legacy one-time copy of the current 21 shoes
+supabase/seed-products.sql         legacy one-time copy of the original 21 shoes
+supabase/new-arrivals.sql          the 23 Nov 2026 arrivals (30 rows), safe to re-run
 supabase/instagram-sync.sql        import columns, product-images bucket, run log
 ```
 
@@ -144,6 +145,8 @@ npm run preview   # serves dist/ at http://localhost:4173
 | `npm run check:supabase` | Live check: project reachable, tables/columns/bucket present (needs `.env`, uses the network) |
 | `npm run instagram:sync` | Imports new Instagram posts into the catalogue (needs the server-side keys) |
 | `npm run instagram:sync:dry` | Same run as a dry run — reads Instagram, uploads and writes nothing |
+| `npm run products:push` | Upserts the 23 Nov 2026 arrivals into `products` (needs `SUPABASE_SERVICE_ROLE_KEY`; prunes rows whose photo is gone) |
+| `npm run products:push:dry` | Prints the exact payload it would send — writes nothing |
 | `npm run check` | All of the offline checks above (run `check:supabase` separately — it needs the network) |
 
 ## Admin order desk
@@ -168,7 +171,7 @@ The storefront reads its shoes from the `products` table in Supabase, so pricing
    ```
 
    Use the **publishable** (or legacy **anon public**) key only. Never put the `service_role` key or an `sb_secret_…` key in a `VITE_` variable — Vite inlines it into the public bundle.
-5. Run `npm run check:supabase` — it reports any missing table, column or Storage bucket against the live project. Then restart `npm run dev`. Open `/admin`: the badge should read *Shop catalogue: 21 shoes from Supabase*. If it says *built-in demo shoes*, the keys are missing or the SQL was not run.
+5. Run `npm run check:supabase` — it reports any missing table, column or Storage bucket against the live project. Then restart `npm run dev`. Open `/admin`: the badge should read *Shop catalogue: 21 shoes from Supabase* (51 once `supabase/new-arrivals.sql` has been run — see [Adding shoes in bulk](#adding-shoes-in-bulk)). If it says *built-in demo shoes*, the keys are missing or the SQL was not run.
 
 ### Change a price (the everyday job)
 
@@ -177,6 +180,24 @@ The storefront reads its shoes from the `products` table in Supabase, so pricing
 3. Look at the storefront: the card, product modal, bag and WhatsApp order message all pick the new price up within about a second (Realtime). A page refresh is only needed if the tab was in the background for a while.
 
 The same flow works for `name`, `size_range`, `available_colors`, `image_url`, `in_stock` and `category`. Product edits do **not** need a Netlify redeploy — only changes to `VITE_*` environment variables do, because Vite bakes those into the build.
+
+### Adding shoes in bulk (a new WhatsApp drop)
+
+The 30 shoes that arrived on 23 November 2026 went in this way — copy it for the next batch.
+
+1. Put the phone photos in `media/shoes/` (WhatsApp names are fine) and copy them into `public/shoes/` as kebab-case `.jpg` files named after the product id: `keyhole-mule-gold.jpg` for `keyhole-mule-gold`. Two shots of one style become `…-alt.jpg`; the shop shows one photo per shoe, so point `image_url` at the first and keep the second for a future gallery.
+2. Append the products to `src/data/products.js` (`image: '/shoes/keyhole-mule-gold.jpg'`, `size_range: '36 - 45'`, `sort_order` above the current maximum). This is what the site serves when Supabase is unreachable.
+3. Mirror the same rows into `supabase/new-arrivals.sql` (`insert … on conflict (id) do nothing`) so a fresh project can be seeded straight from the repo.
+4. Get them into the live table — either paste `supabase/new-arrivals.sql` into **SQL → New query** in the dashboard, or run:
+
+   ```bash
+   npm run products:push:dry    # prints the payload and any missing photo, writes nothing
+   npm run products:push        # upsert the rows, then verify the live table
+   ```
+
+   `products:push` reads the ids and `sort_order` from the SQL file and the rest from `products.js`, so the migration, the offline catalogue and the live table stay in sync. It needs `SUPABASE_SERVICE_ROLE_KEY` in `.env` (server-side only — never under a `VITE_` name); the publishable key cannot write, because RLS only lets signed-in admins insert.
+5. `npm run check:catalogue` (it pins the built-in product count) then `npm run build`.
+6. **When you delete a photo**, delete it from `public/shoes/`, from `src/data/products.js` and from `supabase/new-arrivals.sql`, then run `npm run products:push -- --prune`: it upserts first, lists the live rows whose `image_url` has no file in `public/shoes/`, and deletes exactly those (`--prune` is the only mode that deletes — without it the rows are only reported).
 
 ### What each column does
 
@@ -343,7 +364,7 @@ Each imported post becomes one `products` row, so it is instantly a normal produ
 
    For the Instagram importer, add the server-side values from [Instagram → catalogue](#instagram--catalogue) with scope **Functions** instead: `SUPABASE_URL`, `SUPABASE_SERVICE_ROLE_KEY`, `INSTAGRAM_ACCESS_TOKEN`, `INSTAGRAM_USER_ID`, `INSTAGRAM_SYNC_SECRET` (plus the optional ones).
 
-3. Run `supabase_products_setup.sql` (catalogue: table, 21 seed rows, RLS, Realtime), `supabase/schema.sql` (orders) and — if you want the Instagram importer — `supabase/instagram-sync.sql` in the Supabase SQL editor before switching on the cloud store, then `npm run check:supabase` to confirm each table, column and the `product-images` bucket exists.
+3. Run `supabase_products_setup.sql` (catalogue: table, 21 seed rows, RLS, Realtime), then `supabase/new-arrivals.sql` (the 30 shoes of 23 Nov 2026), `supabase/schema.sql` (orders) and — if you want the Instagram importer — `supabase/instagram-sync.sql` in the Supabase SQL editor before switching on the cloud store, then `npm run check:supabase` to confirm each table, column and the `product-images` bucket exists.
 4. **Trigger a fresh deploy** — Vite inlines `VITE_*` values at build time, so existing builds keep the old settings until they are rebuilt.
 5. Open `/admin` and check the status banner: *Supabase connected — orders are stored in the cloud* means the keys reached the build; *Local test mode* means they did not.
 6. Replace the placeholder in the **Live demo** section above with the Netlify URL.

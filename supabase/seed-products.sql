@@ -4,6 +4,9 @@
 -- Generated from src/data/products.js so the shop looks identical on day one.
 -- Run after supabase/products.sql. Safe to re-run: existing rows are left
 -- alone, which means prices you changed in the dashboard are never overwritten.
+--
+-- The 30 shoes added on 23 November 2026 live in `supabase/new-arrivals.sql`
+-- (run that file after this one; it leaves the rows below untouched).
 -- ---------------------------------------------------------------------------
 
 insert into public.products (

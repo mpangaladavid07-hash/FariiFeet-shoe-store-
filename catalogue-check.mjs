@@ -18,6 +18,10 @@ const check = (label, condition, detail = '') => {
   }
 }
 
+/* src/data/products.js — the 21 original shoes plus the 30 arrivals of
+   23 Nov 2026 (see supabase/new-arrivals.sql). */
+const BUILT_IN_COUNT = 51
+
 /* `.env` points at the live project, so pin the environment for this file:
    Vite's loadEnv() lets process.env win, which keeps these checks offline. */
 const clearSupabaseEnv = () => {
@@ -34,7 +38,7 @@ try {
   const first = await catalogue.loadCatalogue()
 
   check('no keys → built-in catalogue', first.source === 'local', first.source)
-  check('built-in product count', first.products.length === 21, String(first.products.length))
+  check('built-in product count', first.products.length === BUILT_IN_COUNT, String(first.products.length))
   check('getCatalogue mirrors snapshot', catalogue.getCatalogue() === first.products)
   check(
     'offline lookup by id',
@@ -238,7 +242,11 @@ try {
   }
 
   check('failure → built-in catalogue', failed.source === 'local', failed.source)
-  check('failure → 21 products', failed.products.length === 21, String(failed.products.length))
+  check(
+    'failure → built-in products',
+    failed.products.length === BUILT_IN_COUNT,
+    String(failed.products.length),
+  )
   check('failure recorded', /network down/.test(String(failed.error)), String(failed.error))
   check('getCatalogueProduct still resolves', Boolean(catalogue.getCatalogueProduct('new-balance-530')))
 

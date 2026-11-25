@@ -18,7 +18,8 @@
 --     service role / a signed-in admin) can INSERT, UPDATE, DELETE
 --   * publishes the table to Supabase Realtime so an open storefront updates
 --     without a refresh
---   * seeds your 21 current shoes without touching rows you have edited
+--   * seeds your 21 original shoes without touching rows you have edited
+--     (the 30 shoes added on 23 Nov 2026 are in supabase/new-arrivals.sql)
 --
 -- COLUMN CHEAT SHEET (what you edit in the Table Editor)
 --   id                text   URL-safe slug, e.g. 'new-balance-530'.
